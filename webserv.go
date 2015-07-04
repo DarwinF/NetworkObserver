@@ -44,7 +44,7 @@ func checkLogin(w http.ResponseWriter, r *http.Request) {
 
 	if authenticated == true {
 		auth.SetSessionID(w)
-		servePage(w, r, "html/dashboard.html")
+		servePage(w, r, "html/dash-redirect.html")
 	} else {
 		servePage(w, r, "html/error.html")
 	}

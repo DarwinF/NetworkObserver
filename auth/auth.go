@@ -6,7 +6,7 @@ import (
 )
 
 func CheckCredentials(uname, pword string) bool {
-	return false
+	return true
 }
 
 func SetSessionID(w http.ResponseWriter) {
