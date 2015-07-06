@@ -6,19 +6,18 @@ import (
 	"net/http"
 )
 
-//----------------------------------------------
-// Variables
-//----------------------------------------------
-var previousPage string = ""
-
 func main() {
 	http.HandleFunc("/", root)
 	http.HandleFunc("/checkLogin", checkLogin)
+	http.HandleFunc("/dashboard", dashboard)
 
-	http.HandleFunc("/settings", softwareSettings)
-	http.HandleFunc("/configure", testConfig)
-	http.HandleFunc("/test", currTest)
-	http.HandleFunc("/results", testResults)
+	/*
+		TODO: Create handle functions for these
+		"/dashboard/settings"
+		"/dashboard/configuration"
+		"/dashboard/current_test"
+		"/dashboard/results"
+	*/
 
 	http.ListenAndServe(":8951", nil)
 	// Enable SSL and HTTPS connections
@@ -39,76 +38,28 @@ func checkLogin(w http.ResponseWriter, r *http.Request) {
 
 	if authenticated == true {
 		auth.SetSessionID(w)
-		redirect(w, r)
+		http.Redirect(w, r, "/dashboard", http.StatusFound)
 	} else {
 		servePage(w, r, "html/error.html")
 	}
 }
 
-func redirect(w http.ResponseWriter, r *http.Request) {
-	if previousPage == "" {
-		servePage(w, r, "html/dash-redirect.html")
-	} else {
-		servePage(w, r, previousPage)
-	}
-}
-
-func invalidSessionID(callingPage string, w http.ResponseWriter, r *http.Request) {
-	previousPage = callingPage
-	servePage(w, r, "html/login.html")
-}
-
 func root(w http.ResponseWriter, r *http.Request) {
-	page := "html/dashboard.html"
 	valid := auth.CheckSessionID(r)
 
 	if valid == true {
-		servePage(w, r, page)
+		http.Redirect(w, r, "/dashboard", http.StatusFound)
 	} else {
-		invalidSessionID(page, w, r)
+		servePage(w, r, "html/login.html")
 	}
 }
 
-func softwareSettings(w http.ResponseWriter, r *http.Request) {
-	page := "html/dashboard/settings.html"
+func dashboard(w http.ResponseWriter, r *http.Request) {
 	valid := auth.CheckSessionID(r)
 
 	if valid == true {
-		servePage(w, r, page)
+		servePage(w, r, "html/dashboard.html")
 	} else {
-		invalidSessionID(page, w, r)
-	}
-}
-
-func testConfig(w http.ResponseWriter, r *http.Request) {
-	page := "html/dashboard/config.html"
-	valid := auth.CheckSessionID(r)
-
-	if valid == true {
-		servePage(w, r, page)
-	} else {
-		invalidSessionID(page, w, r)
-	}
-}
-
-func currTest(w http.ResponseWriter, r *http.Request) {
-	page := "html/dashboard/test.html"
-	valid := auth.CheckSessionID(r)
-
-	if valid == true {
-		servePage(w, r, page)
-	} else {
-		invalidSessionID(page, w, r)
-	}
-}
-
-func testResults(w http.ResponseWriter, r *http.Request) {
-	page := "html/dashboard/results.html"
-	valid := auth.CheckSessionID(r)
-
-	if valid == true {
-		servePage(w, r, page)
-	} else {
-		invalidSessionID(page, w, r)
+		http.Redirect(w, r, "/", http.StatusFound)
 	}
 }
