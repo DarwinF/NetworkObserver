@@ -2,9 +2,10 @@
 
 Observes a network connection testing connectivity and network speed.
 
-## Version 0.0.1
+## Version 0.0.3
 
-Readme added
+* Session saved using SessionID token in cookie
+* Basic page navigation setup
 
 ***
 
