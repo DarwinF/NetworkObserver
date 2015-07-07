@@ -1,3 +1,10 @@
+//--------------------------------------------
+// main.go
+//
+// Initializes and sets up Network Observer
+// for use.
+//--------------------------------------------
+
 package main
 
 import (
@@ -17,6 +24,7 @@ func main() {
 	http.HandleFunc("/dashboard/current_test", webserv.CurrentTest)
 	http.HandleFunc("/dashboard/results", webserv.Results)
 
+	// Start the Webserver
 	http.ListenAndServe(":8951", nil)
 	// Enable SSL and HTTPS connections
 	//http.ListenAndServeTLS(":8951", "cert.pem", "key.pem", nil)
