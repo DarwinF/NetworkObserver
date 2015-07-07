@@ -2,11 +2,11 @@
 
 Observes a network connection testing connectivity and network speed.
 
-## Version 0.0.3
-
-* Session saved using SessionID token in cookie
-* Basic page navigation setup
-
+## Changelog
+### Version 0.0.4
+ * Page navigation in place for all pages
+### Version 0.0.3
+ * SessionID stored using cookies
 ***
 
 Created by Darwin Froese
