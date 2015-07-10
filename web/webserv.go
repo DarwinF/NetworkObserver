@@ -12,6 +12,7 @@ package webserv
 
 import (
 	"NetworkObserver/auth"
+	"NetworkObserver/reporter"
 	"html/template"
 	"net/http"
 )
@@ -67,7 +68,7 @@ func Settings(w http.ResponseWriter, r *http.Request) {
 	valid := auth.CheckSessionID(r)
 
 	if valid == true {
-		servePageStatic(w, r, "htm/dashboard/settings.html")
+		servePageStatic(w, r, "html/dashboard/settings.html")
 	} else {
 		http.Redirect(w, r, "/", http.StatusFound)
 	}
@@ -77,7 +78,7 @@ func Configure(w http.ResponseWriter, r *http.Request) {
 	valid := auth.CheckSessionID(r)
 
 	if valid == true {
-		servePageStatic(w, r, "htm/dashboard/config.html")
+		servePageStatic(w, r, "html/dashboard/config.html")
 	} else {
 		http.Redirect(w, r, "/", http.StatusFound)
 	}
@@ -87,7 +88,7 @@ func CurrentTest(w http.ResponseWriter, r *http.Request) {
 	valid := auth.CheckSessionID(r)
 
 	if valid == true {
-		servePageStatic(w, r, "htm/dashboard/test.html")
+		servePageDynamic(w, r, "html/dashboard/test.html")
 	} else {
 		http.Redirect(w, r, "/", http.StatusFound)
 	}
@@ -97,7 +98,7 @@ func Results(w http.ResponseWriter, r *http.Request) {
 	valid := auth.CheckSessionID(r)
 
 	if valid == true {
-		servePageStatic(w, r, "htm/dashboard/results.html")
+		servePageStatic(w, r, "html/dashboard/results.html")
 	} else {
 		http.Redirect(w, r, "/", http.StatusFound)
 	}
@@ -107,4 +108,13 @@ func Results(w http.ResponseWriter, r *http.Request) {
 func servePageStatic(w http.ResponseWriter, r *http.Request, pageName string) {
 	t, _ := template.ParseFiles(pageName)
 	t.Execute(w, nil)
+}
+
+// Serves a page after gathering data needed
+func servePageDynamic(w http.ResponseWriter, r *http.Request, pageName string) {
+	rd := reporter.ReportData{}
+	reporter.GatherData("100", "that building", &rd)
+
+	t, _ := template.ParseFiles(pageName)
+	t.Execute(w, rd)
 }
