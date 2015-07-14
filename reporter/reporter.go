@@ -1,6 +1,7 @@
 package reporter
 
 type ReportData struct {
+	Status          string
 	RoomNumber      string
 	Building        string
 	RunLength       string
@@ -15,8 +16,11 @@ type ReportData struct {
 	Graph           string
 }
 
+var currentReport *ReportData = nil
+
 // Read data from report file and store it into a ReportData sturcture
-func GatherData(roomNumber, building string, rd *ReportData) {
+func CreateNew(roomNumber, building string, rd *ReportData) {
+	rd.Status = "Run"
 	rd.RoomNumber = roomNumber
 	rd.Building = building
 	rd.RunLength = "1000hours"
@@ -29,4 +33,6 @@ func GatherData(roomNumber, building string, rd *ReportData) {
 	rd.MaxSpeed = 10000.0
 	rd.MinSpeed = 1.0
 	rd.Graph = "100"
+
+	currentReport = rd
 }

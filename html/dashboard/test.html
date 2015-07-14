@@ -2,17 +2,21 @@
 <html>
 <head>
 	<title>Network Observer - Current Test</title>
-	<meta http-equiv="refresh" content="5">
+	<meta http-equiv="refresh" content="30">
 </head>
 <body>
+	<form action="/dashboard/launch" method="post">
+		<button name="runStatusButton" value="{{.Status}}">{{.Status}}</button>
+	</form>
+	<br>
 	<h4>Test Configuration</h4>
 	<p>Room Number: {{.RoomNumber}}  |  Building: {{.Building}}  |  Run Length: {{.RunLength}}</p>
 	<p>Start Time: {{.StartTime}}  |  Uptime: {{.Uptime}}  |  Last Connection: {{.LastConnect}}</p>
-	<br />
+	<br>
 	<h4>Connection Status:</h4>
 	<p>Disconnections: {{.DisconnectCount}}</p>
 	<p>Disconnection Timeline: {{.Timeline}}</p>
-	<br />
+	<br>
 	<h4>Speed Status:</h4>
 	<p>Average Speed: {{.AvgSpeed}}  |  Max Speed: {{.MaxSpeed}}  |  Min Speed: {{.MinSpeed}}</p>
 	<p>Speed Graph:</p>
