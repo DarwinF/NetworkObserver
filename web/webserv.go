@@ -12,6 +12,7 @@ package webserv
 
 import (
 	"NetworkObserver/auth"
+	"NetworkObserver/configuration"
 	"NetworkObserver/reporter"
 	"html/template"
 	"net/http"
@@ -112,8 +113,6 @@ func servePageStatic(w http.ResponseWriter, r *http.Request, pageName string) {
 
 // Serves a page after gathering data needed
 func servePageDynamic(w http.ResponseWriter, r *http.Request, pageName string) {
-	rd := reporter.ReportData{}
-	reporter.GatherData("100", "that building", &rd)
 
 	t, _ := template.ParseFiles(pageName)
 	t.Execute(w, rd)

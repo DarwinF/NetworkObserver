@@ -36,3 +36,10 @@ func CreateNew(roomNumber, building string, rd *ReportData) {
 
 	currentReport = rd
 }
+
+// For simple interaction with XML
+func (rd *ReportData) CreateMap() map[string]string {
+	m := make(map[string]string)
+
+	return m
+}
