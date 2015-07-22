@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- One test object -->
+<test>
+	<!-- This is used for the reports page to display if a report
+	is for a test that is currently running -->
+	<running>true</running>
+	<!-- Time the test was started -->
+	<start-time>0400 hours, Yesterday</start-time>
+	<!-- The location that the RPi is currently running it's test -->
+	<location>
+		<room>123</room>
+		<building>UCR</building>
+	</location>
+	<!-- Settings specific to this run -->
+	<settings>
+		<run-length>10000 hours</run-length>
+		<internal-ip>1.23.456.789</internal-ip>
+		<url>google.ca</url>
+		<external-ip>8.8.8.8</external-ip>
+	</settings>
+	<!-- Reported information about the connection status -->
+	<connection>
+		<!-- Length of time the RPi has been connected concurrently
+		since the last time it connected -->
+		<uptime>10 hours 59 minutes</uptime>
+		<!-- Time of the last connection -->
+		<last-connection>Yesterday</last-connection>
+		<!-- Disconnection Count -->
+		<disconnections>10</disconnections>
+		<!-- Working on how to haandle timeline -->
+		<timeline>
+		</timeline>
+	</connection>
+	<!-- Reported information from speed testing -->
+	<speed-test>
+		<average-speed>10Mbps</average-speed>
+		<max-speed>100Mbps</max-speed>
+		<min-speed>1Mbps</min-speed>
+	</speed-test>
+</test>
