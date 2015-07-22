@@ -19,10 +19,9 @@ func main() {
 	http.HandleFunc("/dashboard", webserv.Dashboard)
 
 	// Dashboard Pages
-	http.HandleFunc("/dashboard/settings", webserv.Settings)
-	http.HandleFunc("/dashboard/configuration", webserv.Configure)
-	http.HandleFunc("/dashboard/current_test", webserv.CurrentTest)
-	http.HandleFunc("/dashboard/results", webserv.Results)
+	http.HandleFunc("/dashboard/configure", webserv.Configure)
+	http.HandleFunc("/dashboard/start_test", webserv.StartTest)
+	http.HandleFunc("/dashboard/reports", webserv.Reports)
 
 	// Start the Webserver
 	http.ListenAndServe(":8951", nil)

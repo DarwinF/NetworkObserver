@@ -12,8 +12,9 @@ package webserv
 
 import (
 	"NetworkObserver/auth"
-	"NetworkObserver/configuration"
-	"NetworkObserver/reporter"
+	"NetworkObserver/tools"
+	//"NetworkObserver/configuration"
+	//"NetworkObserver/reporter"
 	"html/template"
 	"net/http"
 )
@@ -34,6 +35,7 @@ func Dashboard(w http.ResponseWriter, r *http.Request) {
 	valid := auth.CheckSessionID(r)
 
 	if valid == true {
+		tools.Ping()
 		servePageStatic(w, r, "html/dashboard.html")
 	} else {
 		http.Redirect(w, r, "/", http.StatusFound)
@@ -85,21 +87,21 @@ func Configure(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func CurrentTest(w http.ResponseWriter, r *http.Request) {
+func StartTest(w http.ResponseWriter, r *http.Request) {
 	valid := auth.CheckSessionID(r)
 
 	if valid == true {
-		servePageDynamic(w, r, "html/dashboard/test.html")
+		servePageStatic(w, r, "html/dashboard/starttest.html")
 	} else {
 		http.Redirect(w, r, "/", http.StatusFound)
 	}
 }
 
-func Results(w http.ResponseWriter, r *http.Request) {
+func Reports(w http.ResponseWriter, r *http.Request) {
 	valid := auth.CheckSessionID(r)
 
 	if valid == true {
-		servePageStatic(w, r, "html/dashboard/results.html")
+		servePageStatic(w, r, "html/dashboard/reports.html")
 	} else {
 		http.Redirect(w, r, "/", http.StatusFound)
 	}
@@ -115,5 +117,6 @@ func servePageStatic(w http.ResponseWriter, r *http.Request, pageName string) {
 func servePageDynamic(w http.ResponseWriter, r *http.Request, pageName string) {
 
 	t, _ := template.ParseFiles(pageName)
-	t.Execute(w, rd)
+	//t.Execute(w, rd) // rd => data struct
+	t.Execute(w, nil)
 }
