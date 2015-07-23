@@ -1,40 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- One test object -->
-<test>
+<Test>
 	<!-- This is used for the reports page to display if a report
 	is for a test that is currently running -->
-	<running>true</running>
+	<Status>true</Status>
 	<!-- Time the test was started -->
-	<start-time>0400 hours, Yesterday</start-time>
+	<StartTime>0400 hours, Yesterday</StartTime>
 	<!-- The location that the RPi is currently running it's test -->
-	<location>
-		<room>123</room>
-		<building>UCR</building>
-	</location>
+	<Location>
+		<RoomNumber>123</RoomNumber>
+		<Building>UCR</Building>
+	</Location>
 	<!-- Settings specific to this run -->
-	<settings>
-		<run-length>10000 hours</run-length>
-		<internal-ip>1.23.456.789</internal-ip>
-		<url>google.ca</url>
-		<external-ip>8.8.8.8</external-ip>
-	</settings>
+	<Settings>
+		<RunLength>10000 hours</RunLength>
+		<InternalIP>1.23.456.789</InternalIP>
+		<URL>google.ca</URL>
+		<ExternalIP>8.8.8.8</ExternalIP>
+	</Settings>
 	<!-- Reported information about the connection status -->
-	<connection>
+	<Connection>
 		<!-- Length of time the RPi has been connected concurrently
 		since the last time it connected -->
-		<uptime>10 hours 59 minutes</uptime>
+		<Uptime>10 hours 59 minutes</Uptime>
 		<!-- Time of the last connection -->
-		<last-connection>Yesterday</last-connection>
+		<LastConnect>Yesterday</LastConnect>
 		<!-- Disconnection Count -->
-		<disconnections>10</disconnections>
+		<DisconnectCount>10</DisconnectCount>
 		<!-- Working on how to handle timeline -->
-		<timeline>
-		</timeline>
-	</connection>
+		<Timeline>test</Timeline>
+	</Connection>
 	<!-- Reported information from speed testing -->
-	<speed-test>
-		<average-speed>10Mbps</average-speed>
-		<max-speed>100Mbps</max-speed>
-		<min-speed>1Mbps</min-speed>
-	</speed-test>
-</test>
+	<SpeedTest>
+		<AvgSpeed>10</AvgSpeed>
+		<MaxSpeed>100</MaxSpeed>
+		<MinSpeed>1</MinSpeed>
+	</SpeedTest>
+</Test>

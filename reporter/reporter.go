@@ -1,25 +1,38 @@
 package reporter
 
+/*
 import (
 	"strconv"
-)
+)*/
 
-type ReportData struct {
-	Status          string
-	RoomNumber      string
-	Building        string
-	RunLength       string
-	StartTime       string // Date and Time
-	Uptime          string
-	LastConnect     string // Date and Time
-	DisconnectCount int
-	Timeline        string
-	AvgSpeed        float32
-	MaxSpeed        float32
-	MinSpeed        float32
-	Graph           string
+type Location struct {
+	RoomNumber string `xml:"Location>RoomNumber"`
+	Building   string `xml:"Location>Building"`
 }
 
+type Connection struct {
+	Uptime          string `xml:"Connection>Uptime"`
+	LastConnect     string `xml:"Connection>LastConnect"`
+	DisconnectCount int    `xml:"Connection>DisconnectCount"`
+	Timeline        string `xml:"Connection>Timeline"`
+}
+
+type SpeedTest struct {
+	AvgSpeed float32 `xml:"SpeedTest>AvgSpeed"`
+	MaxSpeed float32 `xml:"SpeedTest>MaxSpeed"`
+	MinSpeed float32 `xml:"SpeedTest>MinSpeed"`
+}
+
+type ReportData struct {
+	Status string
+	Location
+	StartTime string
+	Connection
+	SpeedTest
+	Graph string
+}
+
+/*
 func Fill(stringData map[string]string) ReportData {
 	rd := ReportData{}
 
@@ -39,3 +52,4 @@ func Fill(stringData map[string]string) ReportData {
 
 	return rd
 }
+*/
