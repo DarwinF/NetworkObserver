@@ -12,7 +12,6 @@ package webserv
 
 import (
 	"NetworkObserver/auth"
-	"NetworkObserver/tools"
 	//"NetworkObserver/configuration"
 	//"NetworkObserver/reporter"
 	"html/template"
@@ -35,7 +34,6 @@ func Dashboard(w http.ResponseWriter, r *http.Request) {
 	valid := auth.CheckSessionID(r)
 
 	if valid == true {
-		tools.Ping()
 		servePageStatic(w, r, "html/dashboard.html")
 	} else {
 		http.Redirect(w, r, "/", http.StatusFound)

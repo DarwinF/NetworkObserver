@@ -1,5 +1,9 @@
 package reporter
 
+import (
+	"strconv"
+)
+
 type ReportData struct {
 	Status          string
 	RoomNumber      string
@@ -16,14 +20,22 @@ type ReportData struct {
 	Graph           string
 }
 
-var currentReport *ReportData = nil
+func Fill(stringData map[string]string) ReportData {
+	rd := ReportData{}
 
-// Read data from report file and store it into a ReportData sturcture
-func CreateNew(roomNumber, building string, rd *ReportData) {
+	rd.Status = "new"
+	rd.RoomNumber = data["room"]
+	rd.Building = data["building"]
+	rd.RunLength = data["run-length"]
+	rd.StartTime = data["start-time"]
+	rd.Uptime = data["uptime"]
+	rd.LastConnect = data["last-connection"]
+	rd.DisconnectCount = Itoa(data["disconnections"])
+	rd.Timeline = data["timeline"]
+	rd.AvgSpeed, _ = ParseFloat(data["average-speed"], 32)
+	rd.MaxSpeed, _ = ParseFloat(data["max-speed"], 32)
+	rd.MinSpeed, _ = ParseFloat(data["min-speed"], 32)
+	// rd.Graph = data["graph"]
 
-}
-
-// For simple interaction with XML
-func (rd *ReportData) CreateMap() map[string]string {
-	return nil
+	return rd
 }

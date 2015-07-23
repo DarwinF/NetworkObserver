@@ -27,7 +27,7 @@
 		<last-connection>Yesterday</last-connection>
 		<!-- Disconnection Count -->
 		<disconnections>10</disconnections>
-		<!-- Working on how to haandle timeline -->
+		<!-- Working on how to handle timeline -->
 		<timeline>
 		</timeline>
 	</connection>
