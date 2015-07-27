@@ -1,21 +1,38 @@
 package configuration
 
-import ()
+// this struct contains settings
+// that are configured for a specific
+// test run
+type TestSettings struct {
+	InternalIP string
+	RunLength  string
 
-type ConfigData struct {
-	InternalIP_UCR string
-	InternalIP_MSH string
-	InternalIP_AVM string
-	InternalIP_PHR string
-	ExternalDomain string
-	ExternalIP     string
-	PingDelay      string // time or int?
-	SpeedTestDelay string
+	configSettings
 }
 
-// For simple interaction with XML
-func (cd *ConfigData) CreateMap() map[string]string {
-	m := make(map[string]string)
+// these are settings that are global
+// but can also be overwritten for one
+// specific test run
+type configSettings struct {
+	ExternalIP            []string
+	ExternalURL           []string
+	SpeedTestFileLocation string
+	PingDelay             string
+	SpeedTestDelay        string
+	PortNumber            string
+}
 
-	return m
+// these are the settings that are globally
+// set for the program
+type SystemSettings struct {
+	InternalIPs     map[string]string
+	ReportLocations string
+
+	configSettings
+}
+
+// read the .ini file and fill the system struct
+// with the data
+func init() {
+
 }
