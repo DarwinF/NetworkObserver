@@ -1,13 +1,16 @@
 ; This is a sample settings file
 
 [General]
-portnumber=12345
+port=12345
 
 ; each id must be unique as the address
 ; is mapped to the id, any number of ids
 ; is possible
 [Internal Addresses]
 id=1.23.456.789
+id2=1.23.456.789
+id3=1.23.456.789
+id4=1.23.456.789
 
 ; any number of ips and urls can be declared
 ; and a random one (if there is more than one)
