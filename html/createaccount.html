@@ -6,12 +6,12 @@
 		<link rel="stylesheet" type="text/css" href="login.css">
 	</head>
 	<body>
-		<h2>Please login to proceed</h2>
+		<h2>Account Creation</h2>
 		<form action="/checkLogin" method="post">
 			<p>Username: <input type="text" name="username"></p>
 			<p>Password: <input type="password" name="password"></p>
-			<a href="/createaccount">Create a new account</a><br>
-			<input type="submit" value="Login">
+			<p>Verify Password: <input type="password-verify" name="password-verify"></p>
+			<input type="submit" value="Create">
 		</form>
 	</body>
 </html>

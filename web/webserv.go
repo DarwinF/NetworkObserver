@@ -55,6 +55,17 @@ func CheckLogin(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// Create a new account by comparing both of the passwords
+// entered and then hashing and storing the password
+func CreateAccount(w http.ResponseWriter, r *http.Request) {
+
+}
+
+// Serve the webpage for creating an account
+func Account(w http.ResponseWriter, r *http.Request) {
+
+}
+
 //--------------------------------------------
 // Dashboard page handler functions
 // The following four functions serve dynamic

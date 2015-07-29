@@ -29,7 +29,6 @@ type configSettings struct {
 	SpeedTestFileLocation string
 	PingDelay             string
 	SpeedTestDelay        string
-	PortNumber            string
 }
 
 // these are the settings that are globally
@@ -37,6 +36,7 @@ type configSettings struct {
 type SystemSettings struct {
 	InternalIPs     map[string]string
 	ReportLocations string
+	PortNumber      string
 
 	configSettings
 }

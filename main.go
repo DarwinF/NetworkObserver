@@ -24,6 +24,8 @@ func main() {
 	http.HandleFunc("/", webserv.Root)
 	http.HandleFunc("/checkLogin", webserv.CheckLogin)
 	http.HandleFunc("/dashboard", webserv.Dashboard)
+	http.HandleFunc("/account", webserv.Account)
+	http.HandleFunc("/createaccount", webserv.CreateAccount)
 
 	// Dashboard Pages
 	http.HandleFunc("/dashboard/configure", webserv.Configure)

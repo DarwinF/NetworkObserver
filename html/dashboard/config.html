@@ -6,7 +6,27 @@
 <body>
 	<h4>Network Observer Configuration</h4>
 	<br>
-	<p>IP Addresses</p>
-	<p>Other information that might be necessary</p>
+	<form>
+		<p>Port:</p>
+		<input type="text" name="portnumber">
+		<h5>Internal IP Addresses</h5>
+		<p>Enter one IP address per line in the form:</p>
+		<p>unique_id=ip_address</p>	
+		<textarea rows="6"></textarea>
+		<h5>External IP Addresses</h5>
+		<p>Enter one IP address per line in the form:</p>
+		<textarea rows="6"></textarea>
+		<h5>External URLs</h5>
+		<p>Enter one URL per line in the form:</p>
+		<textarea rows="6"></textarea>
+		<p>Speed Test file location:</p>
+		<input type="text" name="stestfileloc">
+		<p>Report file location:</p>
+		<input type="text" name="reportfileloc">
+		<p>Ping Delay (seconds):</p>
+		<input type="text" name="pingdelay">
+		<p>Speed Test Delay (seconds):</p>
+		<input type="text" name="speedtestdelay">
+	</form>
 </body>
 </html>
