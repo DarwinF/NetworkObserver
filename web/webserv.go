@@ -12,8 +12,6 @@ package webserv
 
 import (
 	"NetworkObserver/auth"
-	//"NetworkObserver/configuration"
-	//"NetworkObserver/reporter"
 	"html/template"
 	"net/http"
 )

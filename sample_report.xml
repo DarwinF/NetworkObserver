@@ -8,10 +8,7 @@
 	<!-- Time the test was started -->
 	<StartTime>0400 hours, Yesterday</StartTime>
 	<!-- The location that the RPi is currently running it's test -->
-	<Location>
-		<RoomNumber>123</RoomNumber>
-		<Building>bldg</Building>
-	</Location>
+	<Location>This is the location.</Location>
 	<!-- Settings specific to this run -->
 	<Settings>
 		<RunLength>10000 hours</RunLength>

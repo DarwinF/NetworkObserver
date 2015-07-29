@@ -8,9 +8,16 @@
 package main
 
 import (
+	"NetworkObserver/configuration"
 	"NetworkObserver/web"
 	"net/http"
 )
+
+var portNumber string
+
+func init() {
+	portNumber = ":" + configuration.GetPortNumber()
+}
 
 func main() {
 	// Base Pages
@@ -24,7 +31,7 @@ func main() {
 	http.HandleFunc("/dashboard/reports", webserv.Reports)
 
 	// Start the Webserver
-	http.ListenAndServe(":8951", nil)
+	http.ListenAndServe(portNumber, nil)
 	// Enable SSL and HTTPS connections
-	//http.ListenAndServeTLS(":8951", "cert.pem", "key.pem", nil)
+	//http.ListenAndServeTLS(portNumber, "cert.pem", "key.pem", nil)
 }

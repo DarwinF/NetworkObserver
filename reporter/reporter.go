@@ -1,10 +1,5 @@
 package reporter
 
-type Location struct {
-	RoomNumber string `xml:"Location>RoomNumber"`
-	Building   string `xml:"Location>Building"`
-}
-
 type Connection struct {
 	Uptime          string `xml:"Connection>Uptime"`
 	LastConnect     string `xml:"Connection>LastConnect"`
@@ -19,10 +14,10 @@ type SpeedTest struct {
 }
 
 type ReportData struct {
-	Status string
-	Location
+	Status    string
+	Location  string
 	StartTime string
+	Graph     string
 	Connection
 	SpeedTest
-	Graph string
 }

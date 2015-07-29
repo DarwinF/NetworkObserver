@@ -2,7 +2,6 @@ package configuration
 
 import (
 	"bufio"
-	"fmt"
 	"os"
 	"strings"
 )
@@ -124,7 +123,7 @@ func storeValue(line string, sect Section) {
 	}
 	// store the value in the correct struct element
 	if sect == InternalAddr {
-		sysConfig.InternalIPs[str[0]] = str[1]
+		sysConfig.InternalIPs[strings.ToLower(str[0])] = str[1]
 	} else if sect == ExternalAddr {
 		if str[0] == "ip" {
 			sysConfig.ExternalIP = append(sysConfig.ExternalIP, str[1])
@@ -148,4 +147,8 @@ func storeValue(line string, sect Section) {
 			sysConfig.SpeedTestDelay = str[1]
 		}
 	}
+}
+
+func GetPortNumber() string {
+	return sysConfig.PortNumber
 }
