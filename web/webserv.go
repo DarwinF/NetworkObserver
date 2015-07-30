@@ -12,9 +12,25 @@ package webserv
 
 import (
 	"NetworkObserver/auth"
+	"NetworkObserver/configuration"
+	"fmt"
 	"html/template"
 	"net/http"
 )
+
+//--------------------------------------------
+// Structs for Pages
+//--------------------------------------------
+type configPage struct {
+	Port          string
+	InternalAddr  string
+	ExternalAddr  string
+	ExternalURL   string
+	SpeedFileLoc  string
+	ReportFileLoc string
+	PingDelay     string
+	SpeedDelay    string
+}
 
 // All URLs default to this function
 func Root(w http.ResponseWriter, r *http.Request) {
@@ -49,7 +65,7 @@ func CheckLogin(w http.ResponseWriter, r *http.Request) {
 
 	if authenticated == true {
 		auth.SetSessionID(w)
-		http.Redirect(w, r, "/dashboard", http.StatusFound)
+		//http.Redirect(w, r, "/dashboard", http.StatusFound)
 	} else {
 		servePageStatic(w, r, "html/error.html")
 	}
@@ -87,8 +103,12 @@ func Settings(w http.ResponseWriter, r *http.Request) {
 func Configure(w http.ResponseWriter, r *http.Request) {
 	valid := auth.CheckSessionID(r)
 
+	// Build struct to serve page with:
+	configStruct := configPage{}
+	buildConfigStruct(&configStruct)
+
 	if valid == true {
-		servePageStatic(w, r, "html/dashboard/config.html")
+		servePageDynamic(w, r, "html/dashboard/config.html", configStruct)
 	} else {
 		http.Redirect(w, r, "/", http.StatusFound)
 	}
@@ -96,6 +116,8 @@ func Configure(w http.ResponseWriter, r *http.Request) {
 
 func StartTest(w http.ResponseWriter, r *http.Request) {
 	valid := auth.CheckSessionID(r)
+
+	fmt.Println(r.FormValue("location"))
 
 	if valid == true {
 		servePageStatic(w, r, "html/dashboard/starttest.html")
@@ -121,9 +143,18 @@ func servePageStatic(w http.ResponseWriter, r *http.Request, pageName string) {
 }
 
 // Serves a page after gathering data needed
-func servePageDynamic(w http.ResponseWriter, r *http.Request, pageName string) {
-
+func servePageDynamic(w http.ResponseWriter, r *http.Request, pageName string, data interface{}) {
 	t, _ := template.ParseFiles(pageName)
-	//t.Execute(w, rd) // rd => data struct
-	t.Execute(w, nil)
+	t.Execute(w, data)
+}
+
+func buildConfigStruct(cp *configPage) {
+	cp.Port = configuration.GetPortNumber()
+	cp.InternalAddr = configuration.GetInternalIPs()
+	cp.ExternalAddr = configuration.GetExternalIPs()
+	cp.ExternalURL = configuration.GetExternalURLs()
+	cp.SpeedFileLoc = configuration.GetSpeedFileLocation()
+	cp.ReportFileLoc = configuration.GetReportsLocation()
+	cp.PingDelay = configuration.GetPingDelay()
+	cp.SpeedDelay = configuration.GetSpeedDelay()
 }
