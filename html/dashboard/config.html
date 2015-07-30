@@ -8,25 +8,26 @@
 	<br>
 	<form>
 		<p>Port:</p>
-		<input type="text" name="portnumber">
+		<input type="text" name="portnumber" value="{{.Port}}">
 		<h5>Internal IP Addresses</h5>
 		<p>Enter one IP address per line in the form:</p>
 		<p>unique_id=ip_address</p>	
-		<textarea rows="6"></textarea>
+		<textarea rows="6">{{.InternalAddr}}</textarea>
 		<h5>External IP Addresses</h5>
 		<p>Enter one IP address per line in the form:</p>
-		<textarea rows="6"></textarea>
+		<textarea rows="6">{{.ExternalAddr}}</textarea>
 		<h5>External URLs</h5>
 		<p>Enter one URL per line in the form:</p>
-		<textarea rows="6"></textarea>
+		<textarea rows="6">{{.ExternalURL}}</textarea>
 		<p>Speed Test file location:</p>
-		<input type="text" name="stestfileloc">
+		<input type="text" name="stestfileloc" value="{{.SpeedFileLoc}}">
 		<p>Report file location:</p>
-		<input type="text" name="reportfileloc">
+		<input type="text" name="reportfileloc" value="{{.ReportFileLoc}}">
 		<p>Ping Delay (seconds):</p>
-		<input type="text" name="pingdelay">
+		<input type="text" name="pingdelay" value="{{.PingDelay}}">
 		<p>Speed Test Delay (seconds):</p>
-		<input type="text" name="speedtestdelay">
+		<input type="text" name="speedtestdelay" value="{{.SpeedDelay}}"><br>
+		<input type="submit" value="Save Settings">
 	</form>
 </body>
 </html>

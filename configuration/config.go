@@ -148,7 +148,3 @@ func storeValue(line string, sect Section) {
 		}
 	}
 }
-
-func GetPortNumber() string {
-	return sysConfig.PortNumber
-}
