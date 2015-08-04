@@ -27,6 +27,9 @@ func main() {
 	http.HandleFunc("/account", webserv.Account)
 	http.HandleFunc("/createaccount", webserv.CreateAccount)
 
+	// Handlers
+	http.HandleFunc("/saveConfig", webserv.SaveConfig)
+
 	// Dashboard Pages
 	http.HandleFunc("/dashboard/configure", webserv.Configure)
 	http.HandleFunc("/dashboard/start_test", webserv.StartTest)

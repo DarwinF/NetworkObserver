@@ -6,19 +6,19 @@
 <body>
 	<h4>Network Observer Configuration</h4>
 	<br>
-	<form>
+	<form action="/saveConfig" method="post">
 		<p>Port:</p>
 		<input type="text" name="portnumber" value="{{.Port}}">
 		<h5>Internal IP Addresses</h5>
 		<p>Enter one IP address per line in the form:</p>
 		<p>unique_id=ip_address</p>	
-		<textarea rows="6">{{.InternalAddr}}</textarea>
+		<textarea rows="6" name="internalip">{{.InternalAddr}}</textarea>
 		<h5>External IP Addresses</h5>
 		<p>Enter one IP address per line in the form:</p>
-		<textarea rows="6">{{.ExternalAddr}}</textarea>
+		<textarea rows="6" name="externalip">{{.ExternalAddr}}</textarea>
 		<h5>External URLs</h5>
 		<p>Enter one URL per line in the form:</p>
-		<textarea rows="6">{{.ExternalURL}}</textarea>
+		<textarea rows="6" name="externalurl">{{.ExternalURL}}</textarea>
 		<p>Speed Test file location:</p>
 		<input type="text" name="stestfileloc" value="{{.SpeedFileLoc}}">
 		<p>Report file location:</p>

@@ -90,6 +90,11 @@ func init() {
 	}
 }
 
+// Write the configuration settings to the configuration file
+func WriteToFile() {
+
+}
+
 func identify(line string, currSect Section) Section {
 	if line[0] == '[' {
 		str := strings.Replace(line, "[", "", -1)

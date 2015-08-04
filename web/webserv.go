@@ -16,6 +16,7 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"strings"
 )
 
 //--------------------------------------------
@@ -65,7 +66,7 @@ func CheckLogin(w http.ResponseWriter, r *http.Request) {
 
 	if authenticated == true {
 		auth.SetSessionID(w)
-		//http.Redirect(w, r, "/dashboard", http.StatusFound)
+		http.Redirect(w, r, "/dashboard", http.StatusFound)
 	} else {
 		servePageStatic(w, r, "html/error.html")
 	}
@@ -80,6 +81,20 @@ func CreateAccount(w http.ResponseWriter, r *http.Request) {
 // Serve the webpage for creating an account
 func Account(w http.ResponseWriter, r *http.Request) {
 
+}
+
+// Save the configuration settings and then reload the configuration
+// page (which will automatically reload the new settings)
+func SaveConfig(w http.ResponseWriter, r *http.Request) {
+	valid := auth.CheckSessionID(r)
+
+	if valid == true {
+		// Save Configuration Settings
+		saveConfigToStruct(r)
+		http.Redirect(w, r, "/dashboard/configure", http.StatusFound)
+	} else {
+		http.Redirect(w, r, "/", http.StatusFound)
+	}
 }
 
 //--------------------------------------------
@@ -148,6 +163,25 @@ func servePageDynamic(w http.ResponseWriter, r *http.Request, pageName string, d
 	t.Execute(w, data)
 }
 
+//----------------------------------------
+// Configuration Handling Functions
+//----------------------------------------
+
+// Saves the setting sto the config file
+func saveConfigToStruct(r *http.Request) {
+	configuration.SetInternalIP(ipToMap(r.FormValue("internalip")))
+	configuration.SetReportLocations(r.FormValue("reportfileloc"))
+	configuration.SetPortNumber(r.FormValue("portnumber"))
+	configuration.SetExternalIPs(lineToSlice(r.FormValue("externalip")))
+	configuration.SetExternalURLs(lineToSlice(r.FormValue("externalurl")))
+	configuration.SetSpeedTestFileLocation(r.FormValue("stestfileloc"))
+	configuration.SetPingDelay(r.FormValue("pingdelay"))
+	configuration.SetSpeedTestDelay(r.FormValue("speedtestdelay"))
+
+	configuration.WriteToFile()
+}
+
+// Loads the settings from the config file
 func buildConfigStruct(cp *configPage) {
 	cp.Port = configuration.GetPortNumber()
 	cp.InternalAddr = configuration.GetInternalIPs()
@@ -157,4 +191,28 @@ func buildConfigStruct(cp *configPage) {
 	cp.ReportFileLoc = configuration.GetReportsLocation()
 	cp.PingDelay = configuration.GetPingDelay()
 	cp.SpeedDelay = configuration.GetSpeedDelay()
+}
+
+// Converts a textarea into a slice with one
+// line per slice index
+func lineToSlice(text string) []string {
+	slice := strings.Split(text, "\n")
+
+	return slice
+}
+
+// Converts the textarea text into a map of
+// id=address for storing in the config struct
+func ipToMap(text string) map[string]string {
+	strmap := make(map[string]string)
+	nlsplit := strings.Split(text, "\n")
+
+	for _, v := range nlsplit {
+		if v != "" {
+			ls := strings.Split(v, "=")
+			strmap[strings.ToLower(ls[0])] = ls[1]
+		}
+	}
+
+	return strmap
 }
