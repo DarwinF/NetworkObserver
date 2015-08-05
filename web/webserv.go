@@ -13,11 +13,15 @@ package webserv
 import (
 	"NetworkObserver/auth"
 	"NetworkObserver/configuration"
-	"fmt"
 	"html/template"
 	"net/http"
 	"strings"
 )
+
+//--------------------------------------------
+// Variables
+//--------------------------------------------
+var errMsg string = ""
 
 //--------------------------------------------
 // Structs for Pages
@@ -33,11 +37,18 @@ type configPage struct {
 	SpeedDelay    string
 }
 
+type testPage struct {
+	ErrorMessage          string
+	SpeedTestFileLocation string
+	PingDelay             string
+	SpeedTestDelay        string
+}
+
 // All URLs default to this function
 func Root(w http.ResponseWriter, r *http.Request) {
 	valid := auth.CheckSessionID(r)
 
-	if valid == true {
+	if valid {
 		http.Redirect(w, r, "/dashboard", http.StatusFound)
 	} else {
 		servePageStatic(w, r, "html/login.html")
@@ -48,7 +59,7 @@ func Root(w http.ResponseWriter, r *http.Request) {
 func Dashboard(w http.ResponseWriter, r *http.Request) {
 	valid := auth.CheckSessionID(r)
 
-	if valid == true {
+	if valid {
 		servePageStatic(w, r, "html/dashboard.html")
 	} else {
 		http.Redirect(w, r, "/", http.StatusFound)
@@ -88,10 +99,26 @@ func Account(w http.ResponseWriter, r *http.Request) {
 func SaveConfig(w http.ResponseWriter, r *http.Request) {
 	valid := auth.CheckSessionID(r)
 
-	if valid == true {
+	if valid {
 		// Save Configuration Settings
 		saveConfigToStruct(r)
 		http.Redirect(w, r, "/dashboard/configure", http.StatusFound)
+	} else {
+		http.Redirect(w, r, "/", http.StatusFound)
+	}
+}
+
+// The test has had it's "test specific settings "
+func SaveTest(w http.ResponseWriter, r *http.Request) {
+	valid := auth.CheckSessionID(r)
+
+	if valid {
+		if r.FormValue("runlength") == "" {
+			errMsg = "You need to enter a run length!"
+			http.Redirect(w, r, "/dashboard/start_test", http.StatusFound)
+		}
+		// this is temporary
+		http.Redirect(w, r, "/dashboard", http.StatusFound)
 	} else {
 		http.Redirect(w, r, "/", http.StatusFound)
 	}
@@ -108,7 +135,7 @@ func SaveConfig(w http.ResponseWriter, r *http.Request) {
 func Settings(w http.ResponseWriter, r *http.Request) {
 	valid := auth.CheckSessionID(r)
 
-	if valid == true {
+	if valid {
 		servePageStatic(w, r, "html/dashboard/settings.html")
 	} else {
 		http.Redirect(w, r, "/", http.StatusFound)
@@ -122,7 +149,7 @@ func Configure(w http.ResponseWriter, r *http.Request) {
 	configStruct := configPage{}
 	buildConfigStruct(&configStruct)
 
-	if valid == true {
+	if valid {
 		servePageDynamic(w, r, "html/dashboard/config.html", configStruct)
 	} else {
 		http.Redirect(w, r, "/", http.StatusFound)
@@ -132,10 +159,19 @@ func Configure(w http.ResponseWriter, r *http.Request) {
 func StartTest(w http.ResponseWriter, r *http.Request) {
 	valid := auth.CheckSessionID(r)
 
-	fmt.Println(r.FormValue("location"))
+	ts := testPage{}
+	buildTestStruct(&ts)
 
-	if valid == true {
-		servePageStatic(w, r, "html/dashboard/starttest.html")
+	// Copy the error message over and display it and then erase it
+	// this way the message will only be displayed when there is an
+	// actual error
+	if errMsg != "" {
+		ts.ErrorMessage = errMsg
+		errMsg = ""
+	}
+
+	if valid {
+		servePageDynamic(w, r, "html/dashboard/starttest.html", ts)
 	} else {
 		http.Redirect(w, r, "/", http.StatusFound)
 	}
@@ -144,7 +180,7 @@ func StartTest(w http.ResponseWriter, r *http.Request) {
 func Reports(w http.ResponseWriter, r *http.Request) {
 	valid := auth.CheckSessionID(r)
 
-	if valid == true {
+	if valid {
 		servePageStatic(w, r, "html/dashboard/reports.html")
 	} else {
 		http.Redirect(w, r, "/", http.StatusFound)
@@ -191,6 +227,12 @@ func buildConfigStruct(cp *configPage) {
 	cp.ReportFileLoc = configuration.GetReportsLocation()
 	cp.PingDelay = configuration.GetPingDelay()
 	cp.SpeedDelay = configuration.GetSpeedDelay()
+}
+
+func buildTestStruct(ts *testPage) {
+	ts.PingDelay = configuration.GetPingDelay()
+	ts.SpeedTestDelay = configuration.GetSpeedDelay()
+	ts.SpeedTestFileLocation = configuration.GetSpeedFileLocation()
 }
 
 // Converts a textarea into a slice with one

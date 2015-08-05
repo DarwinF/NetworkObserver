@@ -4,23 +4,28 @@
 	<title>Network Observer Test Configuration</title>
 </head>
 <body>
-	<h4>Configure Test</h4>
-	<br>
-	<form method="post">
-		<p>Location:</p>
+	<h4>Network Observer Test Configuration</h4>
+	<a href="/dashboard">Dashboard</a>
+	<form method="post" action="/savetest">
+		{{.ErrorMessage}}
+		<h5>Location:</h5>
+		<p>If this is left blank, one of the internal IPs will be randomly chosen. Otherwise,
+		the internal IP that has an ID contained in the location field will be chosen.</p>
 		<input type="text" name="location">
-		<p>Run Length (hours):</p>
+		<h5>Run Length (hours):</h5>
 		<input type="text" name="runlength">
 		<h5>External IP Address</h5>
+		<p>If this is left blank, one of the default IP addresses will be chosen.</p>
 		<input type="text" name="externalIP">
 		<h5>External URL</h5>
+		<p>If this is left blank, one of the default URLs will be chosen.</p>
 		<input type="text" name="externalURL">
-		<p>Speed Test file location:</p>
-		<input type="text" name="stestfileloc">
-		<p>Ping Delay (seconds):</p>
-		<input type="text" name="pingdelay">
-		<p>Speed Test Delay (seconds):</p>
-		<input type="text" name="speedtestdelay"><br>
+		<h5>Speed Test file location:</h5>
+		<input type="text" name="stestfileloc" value="{{.SpeedTestFileLocation}}">
+		<h5>Ping Delay (seconds):</h5>
+		<input type="text" name="pingdelay" value="{{.PingDelay}}">
+		<h5>Speed Test Delay (seconds):</h5>
+		<input type="text" name="speedtestdelay" value="{{.SpeedTestDelay}}"><br>
 		<input type="submit" value="Start Test">
 	</form>
 </body>
