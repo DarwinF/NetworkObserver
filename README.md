@@ -9,6 +9,7 @@ Observes a network connection testing connectivity and network speed.
 
 ### Version 0.0.8
 * Configuration settings are saved (session only) so that the new settings are displayed everytime the configuration page is loaded
+
 ### Version 0.0.7
 * Configuration file can be read into a configuration struct
 * Configuration data is filled into the configuration page when it is loaded
