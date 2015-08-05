@@ -1,33 +1,67 @@
 package configuration
 
+import (
+	"reflect"
+)
+
 func SetInternalIP(ip map[string]string) {
-	sysConfig.InternalIPs = ip
+	equal := reflect.DeepEqual(ip, sysConfig.InternalIPs)
+
+	if !equal {
+		updated = true
+		sysConfig.InternalIPs = ip
+	}
 }
 
 func SetReportLocations(loc string) {
-	sysConfig.ReportLocations = loc
+	if loc != sysConfig.ReportLocations {
+		updated = true
+		sysConfig.ReportLocations = loc
+	}
 }
 
 func SetPortNumber(pn string) {
-	sysConfig.PortNumber = pn
+	if pn != sysConfig.PortNumber {
+		updated = true
+		sysConfig.PortNumber = pn
+	}
 }
 
 func SetExternalIPs(ips []string) {
-	sysConfig.ExternalIP = ips
+	equal := reflect.DeepEqual(ips, sysConfig.ExternalIP)
+
+	if !equal {
+		updated = true
+		sysConfig.ExternalIP = ips
+	}
 }
 
 func SetExternalURLs(urls []string) {
-	sysConfig.ExternalURL = urls
+	equal := reflect.DeepEqual(urls, sysConfig.ExternalURL)
+
+	if !equal {
+		updated = true
+		sysConfig.ExternalURL = urls
+	}
 }
 
 func SetSpeedTestFileLocation(loc string) {
-	sysConfig.SpeedTestFileLocation = loc
+	if loc != sysConfig.SpeedTestFileLocation {
+		updated = true
+		sysConfig.SpeedTestFileLocation = loc
+	}
 }
 
 func SetPingDelay(delay string) {
-	sysConfig.PingDelay = delay
+	if delay != sysConfig.PingDelay {
+		updated = true
+		sysConfig.PingDelay = delay
+	}
 }
 
 func SetSpeedTestDelay(delay string) {
-	sysConfig.SpeedTestDelay = delay
+	if delay != sysConfig.SpeedTestDelay {
+		updated = true
+		sysConfig.SpeedTestDelay = delay
+	}
 }

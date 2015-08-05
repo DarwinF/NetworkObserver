@@ -167,7 +167,7 @@ func servePageDynamic(w http.ResponseWriter, r *http.Request, pageName string, d
 // Configuration Handling Functions
 //----------------------------------------
 
-// Saves the setting sto the config file
+// Saves the settings to the config file
 func saveConfigToStruct(r *http.Request) {
 	configuration.SetInternalIP(ipToMap(r.FormValue("internalip")))
 	configuration.SetReportLocations(r.FormValue("reportfileloc"))
@@ -196,6 +196,10 @@ func buildConfigStruct(cp *configPage) {
 // Converts a textarea into a slice with one
 // line per slice index
 func lineToSlice(text string) []string {
+	// Newlines are considered "whitespace" in Go so this will remove the trailing
+	// newline characters. Any number of blank lines can be inserted at the end of
+	// the text area and they will be removed
+	text = strings.TrimSpace(text)
 	slice := strings.Split(text, "\n")
 
 	return slice
@@ -204,6 +208,8 @@ func lineToSlice(text string) []string {
 // Converts the textarea text into a map of
 // id=address for storing in the config struct
 func ipToMap(text string) map[string]string {
+	text = strings.TrimSpace(text)
+
 	strmap := make(map[string]string)
 	nlsplit := strings.Split(text, "\n")
 

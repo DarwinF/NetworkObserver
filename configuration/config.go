@@ -44,8 +44,11 @@ type SystemSettings struct {
 //--------------------------------
 // Variables
 //--------------------------------
-var configPath = "sample_config.txt"
+//var configPath = "sample_config.txt"
+var configPath = "config.txt"
 var sysConfig SystemSettings
+
+var updated = false
 
 //--------------------------------
 // Enum
@@ -92,7 +95,48 @@ func init() {
 
 // Write the configuration settings to the configuration file
 func WriteToFile() {
+	if !updated {
+		return
+	}
 
+	file, _ := os.Create(configPath)
+	defer file.Close()
+
+	w := bufio.NewWriter(file)
+	defer w.Flush()
+
+	w.WriteString("[General]\n")
+	w.WriteString("port=" + sysConfig.PortNumber + "\n")
+
+	w.WriteString("[Internal Addresses]\n")
+	writeMap(sysConfig.InternalIPs, w)
+
+	w.WriteString("[External Addresses]\n")
+	writeSlice(sysConfig.ExternalIP, "ip", w)
+	writeSlice(sysConfig.ExternalURL, "url", w)
+
+	w.WriteString("[File Locations]\n")
+	w.WriteString("speedtest=" + sysConfig.SpeedTestFileLocation + "\n")
+	w.WriteString("reports=" + sysConfig.ReportLocations + "\n")
+
+	w.WriteString("[Test Delays]\n")
+	w.WriteString("ping=" + sysConfig.PingDelay + "\n")
+	w.WriteString("speedtest=" + sysConfig.SpeedTestDelay + "\n")
+
+	// everything is written and nothing is new anymore
+	updated = false
+}
+
+func writeMap(m map[string]string, w *bufio.Writer) {
+	for k, v := range m {
+		w.WriteString(k + "=" + v + "\n")
+	}
+}
+
+func writeSlice(s []string, id string, w *bufio.Writer) {
+	for _, v := range s {
+		w.WriteString(id + "=" + v + "\n")
+	}
 }
 
 func identify(line string, currSect Section) Section {
