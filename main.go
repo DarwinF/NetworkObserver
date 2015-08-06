@@ -13,9 +13,11 @@ import (
 	"net/http"
 )
 
-var portNumber string
+// Random default value
+var portNumber string = "5000"
 
 func init() {
+	// Check for configuration file
 	portNumber = ":" + configuration.GetPortNumber()
 }
 
@@ -24,8 +26,8 @@ func main() {
 	http.HandleFunc("/", webserv.Root)
 	http.HandleFunc("/checkLogin", webserv.CheckLogin)
 	http.HandleFunc("/dashboard", webserv.Dashboard)
-	http.HandleFunc("/account", webserv.Account)
 	http.HandleFunc("/createaccount", webserv.CreateAccount)
+	http.HandleFunc("/account", webserv.HandleAccount)
 
 	// Handlers
 	http.HandleFunc("/saveConfig", webserv.SaveConfig)

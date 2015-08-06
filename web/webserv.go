@@ -13,6 +13,7 @@ package webserv
 import (
 	"NetworkObserver/auth"
 	"NetworkObserver/configuration"
+	"crypto/sha256"
 	"html/template"
 	"net/http"
 	"strings"
@@ -38,10 +39,19 @@ type configPage struct {
 }
 
 type testPage struct {
-	ErrorMessage          string
+	ErrorMessage
 	SpeedTestFileLocation string
 	PingDelay             string
 	SpeedTestDelay        string
+}
+
+type createAccount struct {
+	ErrorMessage
+	Username string
+}
+
+type ErrorMessage struct {
+	Msg string
 }
 
 // All URLs default to this function
@@ -73,7 +83,9 @@ func CheckLogin(w http.ResponseWriter, r *http.Request) {
 	pword := r.FormValue("password")
 
 	// Authenticate user credentials
-	authenticated := auth.CheckCredentials(uname, pword)
+	// Hash password
+	hash := sha256.Sum256([]byte(pword))
+	authenticated := auth.CheckCredentials(uname, hash)
 
 	if authenticated == true {
 		auth.SetSessionID(w)
@@ -86,12 +98,31 @@ func CheckLogin(w http.ResponseWriter, r *http.Request) {
 // Create a new account by comparing both of the passwords
 // entered and then hashing and storing the password
 func CreateAccount(w http.ResponseWriter, r *http.Request) {
-
+	servePageStatic(w, r, "html/createaccount.html")
 }
 
 // Serve the webpage for creating an account
-func Account(w http.ResponseWriter, r *http.Request) {
+func HandleAccount(w http.ResponseWriter, r *http.Request) {
+	un := r.FormValue("username")
+	pw := r.FormValue("password")
+	pwv := r.FormValue("password-verify")
 
+	if auth.UsernameInUse(un) {
+		em := ErrorMessage{Msg: "The username is in use."}
+		servePageDynamic(w, r, "html/createaccount.html", em)
+	} else if un == "" {
+		em := ErrorMessage{Msg: "The username field cannot be empty."}
+		servePageDynamic(w, r, "html/createaccount.html", em)
+	} else if pw != pwv || pw == "" || pwv == "" {
+		ca := createAccount{}
+		ca.Msg = "The passwords do not match."
+		ca.Username = un
+		servePageDynamic(w, r, "html/createaccount.html", ca)
+	} else if pw == pwv {
+		h := sha256.Sum256([]byte(pw))
+		auth.SavePassword(un, h)
+		servePageStatic(w, r, "html/success.html")
+	}
 }
 
 // Save the configuration settings and then reload the configuration
@@ -118,6 +149,7 @@ func SaveTest(w http.ResponseWriter, r *http.Request) {
 			http.Redirect(w, r, "/dashboard/start_test", http.StatusFound)
 		}
 		// this is temporary
+		// start running the test at this point
 		http.Redirect(w, r, "/dashboard", http.StatusFound)
 	} else {
 		http.Redirect(w, r, "/", http.StatusFound)
@@ -166,7 +198,7 @@ func StartTest(w http.ResponseWriter, r *http.Request) {
 	// this way the message will only be displayed when there is an
 	// actual error
 	if errMsg != "" {
-		ts.ErrorMessage = errMsg
+		ts.Msg = errMsg
 		errMsg = ""
 	}
 

@@ -7,7 +7,7 @@
 	<h4>Network Observer Test Configuration</h4>
 	<a href="/dashboard">Dashboard</a>
 	<form method="post" action="/savetest">
-		{{.ErrorMessage}}
+		{{.Msg}}
 		<h5>Location:</h5>
 		<p>If this is left blank, one of the internal IPs will be randomly chosen. Otherwise,
 		the internal IP that has an ID contained in the location field will be chosen.</p>
