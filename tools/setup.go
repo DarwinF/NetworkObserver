@@ -2,39 +2,43 @@ package tools
 
 import (
 	"NetworkObserver/configuration"
-	"NetworkObserver/webserv"
+	"errors"
 )
 
 type TestData struct {
-	location        string
-	runlen          string
-	ext_ip          string
-	ext_url         string
-	speedtestfile   string
-	ping_delay      string
-	speedtest_delay string
+	Location        string
+	Runlen          string
+	Ext_ip          string
+	Ext_url         string
+	Speedtestfile   string
+	Ping_delay      string
+	Speedtest_delay string
 }
 
-func SetupTest(td TestData) pingInfo {
+func SetupTest(td TestData) (pingInfo, error) {
 	pi := pingInfo{}
+	err := errors.New("")
 
-	if td.ext_ip == "" {
+	if td.Ext_ip == "" {
 		pi.externalip = configuration.GetRandomExternalIP()
 	} else {
-		pi.externalip = td.ext_ip
+		pi.externalip = td.Ext_ip
 	}
 
-	if td.ext_url == "" {
+	if td.Ext_url == "" {
 		pi.externalurl = configuration.GetRandomExternalURL()
 	} else {
-		pi.externalurl = td.ext_url
+		pi.externalurl = td.Ext_url
 	}
 
-	pi.internalip = configuration.GetInternalIPbyKey(location)
+	pi.internalip, err = configuration.GetInternalIPbyKey(td.Location)
+	if err != nil {
+		return pingInfo{}, err
+	}
 
-	pi.pingDelay = td.ping_delay
+	pi.pingDelay = td.Ping_delay
 
-	return pi
+	return pi, nil
 }
 
 func RunTest(pi pingInfo, runlen int) {

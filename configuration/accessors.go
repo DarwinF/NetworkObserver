@@ -1,7 +1,9 @@
 package configuration
 
 import (
+	"errors"
 	"math/rand"
+	"strings"
 )
 
 func GetPortNumber() string {
@@ -18,18 +20,14 @@ func GetInternalIPs() string {
 	return ipString
 }
 
-func GetInternalIPbyKey(k string) string {
-	v = ""
-
-	if k != "" {
-		v = sysConfig.InternalIPs[k]
+func GetInternalIPbyKey(key string) (string, error) {
+	for k, v := range sysConfig.InternalIPs {
+		if strings.Contains(k, key) {
+			return v, nil
+		}
 	}
 
-	if v == "" {
-		return sysConfig.InternalIPs[rand.Intn(len(sysConfig.InternalIPs))]
-	} else {
-		return v
-	}
+	return "", errors.New("No ip associated with the key could be found.")
 }
 
 func GetExternalIPs() string {

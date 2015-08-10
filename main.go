@@ -23,21 +23,21 @@ func init() {
 
 func main() {
 	// Base Pages
-	http.HandleFunc("/", webserv.Root)
-	http.HandleFunc("/checkLogin", webserv.CheckLogin)
-	http.HandleFunc("/dashboard", webserv.Dashboard)
-	http.HandleFunc("/createaccount", webserv.CreateAccount)
-	http.HandleFunc("/account", webserv.HandleAccount)
+	http.HandleFunc("/", web.Root)
+	http.HandleFunc("/checkLogin", web.CheckLogin)
+	http.HandleFunc("/dashboard", web.Dashboard)
+	http.HandleFunc("/createaccount", web.CreateAccount)
+	http.HandleFunc("/account", web.HandleAccount)
 
 	// Handlers
-	http.HandleFunc("/saveConfig", webserv.SaveConfig)
-	http.HandleFunc("/savetest", webserv.SaveTest)
-	http.HandleFunc("/teststarted", webserv.TestStarted)
+	http.HandleFunc("/saveConfig", web.SaveConfig)
+	http.HandleFunc("/savetest", web.SaveTest)
+	http.HandleFunc("/teststarted", web.TestStarted)
 
 	// Dashboard Pages
-	http.HandleFunc("/dashboard/configure", webserv.Configure)
-	http.HandleFunc("/dashboard/start_test", webserv.StartTest)
-	http.HandleFunc("/dashboard/reports", webserv.Reports)
+	http.HandleFunc("/dashboard/configure", web.Configure)
+	http.HandleFunc("/dashboard/start_test", web.StartTest)
+	http.HandleFunc("/dashboard/reports", web.Reports)
 
 	// Start the Webserver
 	http.ListenAndServe(portNumber, nil)

@@ -8,7 +8,7 @@
 // this file.
 //--------------------------------------------
 
-package webserv
+package web
 
 import (
 	"NetworkObserver/auth"
@@ -149,20 +149,25 @@ func SaveTest(w http.ResponseWriter, r *http.Request) {
 	valid := auth.CheckSessionID(r)
 
 	if valid {
-		if r.FormValue("runlength") == "" {
-			errMsg = "You need to enter a run length!"
+		if r.FormValue("runlength") == "" || r.FormValue("location") == "" {
+			errMsg = "You need to enter a run length and a location!"
 			http.Redirect(w, r, "/dashboard/start_test", http.StatusFound)
 		} else {
 			td := tools.TestData{}
-			td.runlen = r.FormValue("runlength")
-			td.ext_ip = r.FormValue("externalIP")
-			td.ext_url = r.FormValue("externalURL")
-			td.location = r.FormValue("location")
-			td.ping_delay = r.FormValue("pingdelay")
-			td.speedtest_delay = r.FormValue("speedtestedelay")
-			td.speedtestfile = r.FormValue("stestfileloc")
+			td.Runlen = r.FormValue("runlength")
+			td.Ext_ip = r.FormValue("externalIP")
+			td.Ext_url = r.FormValue("externalURL")
+			td.Location = r.FormValue("location")
+			td.Ping_delay = r.FormValue("pingdelay")
+			td.Speedtest_delay = r.FormValue("speedtestedelay")
+			td.Speedtestfile = r.FormValue("stestfileloc")
 
-			tools.SetupTest(td)
+			_, err := tools.SetupTest(td)
+
+			if err != nil {
+				errMsg = "No ip associated with the key could be found."
+				http.Redirect(w, r, "/dashboard/start_test", http.StatusFound)
+			}
 		}
 	} else {
 		http.Redirect(w, r, "/", http.StatusFound)
