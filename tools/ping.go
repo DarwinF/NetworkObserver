@@ -16,6 +16,13 @@ import (
 	"os"
 )
 
+type pingInfo struct {
+	pingDelay   string
+	externalip  string
+	internalip  string
+	externalurl string
+}
+
 func Ping() {
 	c, err := icmp.ListenPacket("udp4", "192.168.1.100")
 

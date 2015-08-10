@@ -124,7 +124,7 @@ func SavePassword(uname string, pword [32]byte) {
 	w := bufio.NewWriter(file)
 	defer w.Flush()
 
-	w.WriteString(uname + ":" + string(pword[:]))
+	w.WriteString(uname + ":" + string(pword[:]) + "\n")
 }
 
 func writeCookieValue(value int) {
@@ -134,5 +134,5 @@ func writeCookieValue(value int) {
 	w := bufio.NewWriter(file)
 	defer w.Flush()
 
-	w.WriteString(strconv.Itoa(value))
+	w.WriteString(strconv.Itoa(value) + "\n")
 }

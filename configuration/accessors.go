@@ -1,5 +1,9 @@
 package configuration
 
+import (
+	"math/rand"
+)
+
 func GetPortNumber() string {
 	return sysConfig.PortNumber
 }
@@ -14,6 +18,20 @@ func GetInternalIPs() string {
 	return ipString
 }
 
+func GetInternalIPbyKey(k string) string {
+	v = ""
+
+	if k != "" {
+		v = sysConfig.InternalIPs[k]
+	}
+
+	if v == "" {
+		return sysConfig.InternalIPs[rand.Intn(len(sysConfig.InternalIPs))]
+	} else {
+		return v
+	}
+}
+
 func GetExternalIPs() string {
 	ipString := ""
 
@@ -24,6 +42,10 @@ func GetExternalIPs() string {
 	return ipString
 }
 
+func GetRandomExternalIP() string {
+	return sysConfig.ExternalIP[rand.Intn(len(sysConfig.ExternalIP))]
+}
+
 func GetExternalURLs() string {
 	urlString := ""
 
@@ -32,6 +54,10 @@ func GetExternalURLs() string {
 	}
 
 	return urlString
+}
+
+func GetRandomExternalURL() string {
+	return sysConfig.ExternalURL[rand.Intn(len(sysConfig.ExternalURL))]
 }
 
 func GetSpeedFileLocation() string {

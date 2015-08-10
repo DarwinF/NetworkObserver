@@ -13,6 +13,7 @@ package webserv
 import (
 	"NetworkObserver/auth"
 	"NetworkObserver/configuration"
+	"NetworkObserver/tools"
 	"crypto/sha256"
 	"html/template"
 	"net/http"
@@ -108,11 +109,15 @@ func HandleAccount(w http.ResponseWriter, r *http.Request) {
 	pwv := r.FormValue("password-verify")
 
 	if auth.UsernameInUse(un) {
-		em := ErrorMessage{Msg: "The username is in use."}
-		servePageDynamic(w, r, "html/createaccount.html", em)
+		ca := createAccount{}
+		ca.Msg = "The username " + un + " is currently in use."
+		ca.Username = ""
+		servePageDynamic(w, r, "html/createaccount.html", ca)
 	} else if un == "" {
-		em := ErrorMessage{Msg: "The username field cannot be empty."}
-		servePageDynamic(w, r, "html/createaccount.html", em)
+		ca := createAccount{}
+		ca.Msg = "You must enter a username."
+		ca.Username = ""
+		servePageDynamic(w, r, "html/createaccount.html", ca)
 	} else if pw != pwv || pw == "" || pwv == "" {
 		ca := createAccount{}
 		ca.Msg = "The passwords do not match."
@@ -147,10 +152,29 @@ func SaveTest(w http.ResponseWriter, r *http.Request) {
 		if r.FormValue("runlength") == "" {
 			errMsg = "You need to enter a run length!"
 			http.Redirect(w, r, "/dashboard/start_test", http.StatusFound)
+		} else {
+			td := tools.TestData{}
+			td.runlen = r.FormValue("runlength")
+			td.ext_ip = r.FormValue("externalIP")
+			td.ext_url = r.FormValue("externalURL")
+			td.location = r.FormValue("location")
+			td.ping_delay = r.FormValue("pingdelay")
+			td.speedtest_delay = r.FormValue("speedtestedelay")
+			td.speedtestfile = r.FormValue("stestfileloc")
+
+			tools.SetupTest(td)
 		}
-		// this is temporary
-		// start running the test at this point
-		http.Redirect(w, r, "/dashboard", http.StatusFound)
+	} else {
+		http.Redirect(w, r, "/", http.StatusFound)
+	}
+}
+
+// A redirection page to notify the user that the test has been started
+func TestStarted(w http.ResponseWriter, r *http.Request) {
+	valid := auth.CheckSessionID(r)
+
+	if valid {
+		servePageStatic(w, r, "html/dashboard/testnotify.html")
 	} else {
 		http.Redirect(w, r, "/", http.StatusFound)
 	}

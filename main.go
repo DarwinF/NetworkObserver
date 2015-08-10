@@ -32,6 +32,7 @@ func main() {
 	// Handlers
 	http.HandleFunc("/saveConfig", webserv.SaveConfig)
 	http.HandleFunc("/savetest", webserv.SaveTest)
+	http.HandleFunc("/teststarted", webserv.TestStarted)
 
 	// Dashboard Pages
 	http.HandleFunc("/dashboard/configure", webserv.Configure)
