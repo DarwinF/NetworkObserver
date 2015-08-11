@@ -23,6 +23,17 @@ type pingInfo struct {
 	externalurl string
 }
 
+var file *os.File
+
+func init() {
+	file, _ = os.OpenFile("logfile", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	log.SetOutput(file)
+}
+
+func Cleanup() {
+	file.Close()
+}
+
 func Ping() {
 	c, err := icmp.ListenPacket("udp4", "192.168.1.100")
 

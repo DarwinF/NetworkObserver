@@ -3,6 +3,8 @@ package tools
 import (
 	"NetworkObserver/configuration"
 	"errors"
+	"strconv"
+	"time"
 )
 
 type TestData struct {
@@ -42,9 +44,17 @@ func SetupTest(td TestData) (pingInfo, error) {
 }
 
 func RunTest(pi pingInfo, runlen int) {
-	// set current time
-	// start loop that lasts runlength long
-	// ping
-	// speedtest -- later
-	// delay
+	lp := time.Now()
+	end := time.Now().Add(time.Duration(runlen) * time.Hour)
+
+	for time.Now().Before(end) {
+		delay, _ := strconv.Atoi(pi.pingDelay)
+		if time.Now().After(lp.Add(time.Duration(delay) * time.Second)) {
+			Ping()
+			lp = time.Now()
+		}
+		// speedtest -- later
+	}
+
+	Cleanup()
 }

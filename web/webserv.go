@@ -17,6 +17,7 @@ import (
 	"crypto/sha256"
 	"html/template"
 	"net/http"
+	"strconv"
 	"strings"
 )
 
@@ -162,12 +163,16 @@ func SaveTest(w http.ResponseWriter, r *http.Request) {
 			td.Speedtest_delay = r.FormValue("speedtestedelay")
 			td.Speedtestfile = r.FormValue("stestfileloc")
 
-			_, err := tools.SetupTest(td)
+			pi, err := tools.SetupTest(td)
 
 			if err != nil {
 				errMsg = "No ip associated with the key could be found."
 				http.Redirect(w, r, "/dashboard/start_test", http.StatusFound)
 			}
+
+			runlen, _ := strconv.Atoi(td.Runlen)
+			go tools.RunTest(pi, runlen)
+			http.Redirect(w, r, "/dashboard", http.StatusFound)
 		}
 	} else {
 		http.Redirect(w, r, "/", http.StatusFound)
