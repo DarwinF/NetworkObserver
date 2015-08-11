@@ -21,6 +21,8 @@ type pingResponse struct {
 	internal     bool
 	external_ip  bool
 	external_url bool
+
+	err error
 }
 
 func SetupTest(td TestData) (pingInfo, error) {
