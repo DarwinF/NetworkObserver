@@ -38,7 +38,9 @@ func Ping() {
 	c, err := icmp.ListenPacket("udp4", "192.168.1.100")
 
 	if err != nil {
-		log.Fatal(err)
+		log.Print(err)
+		log.Println()
+		return
 	}
 	defer c.Close()
 
@@ -52,22 +54,30 @@ func Ping() {
 
 	wb, err := wm.Marshal(nil)
 	if err != nil {
-		log.Fatal(err)
+		log.Print(err)
+		log.Println()
+		return
 	}
 
 	if _, err := c.WriteTo(wb, &net.UDPAddr{IP: net.ParseIP("8.8.8.8"), Zone: "en0"}); err != nil {
-		log.Fatal(err)
+		log.Print(err)
+		log.Println()
+		return
 	}
 
 	rb := make([]byte, 1500)
 	n, peer, err := c.ReadFrom(rb)
 	if err != nil {
-		log.Fatal(err)
+		log.Print(err)
+		log.Println()
+		return
 	}
 
 	rm, err := icmp.ParseMessage(iana.ProtocolICMP, rb[:n])
 	if err != nil {
-		log.Fatal(err)
+		log.Print(err)
+		log.Println()
+		return
 	}
 
 	switch rm.Type {
