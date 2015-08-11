@@ -36,6 +36,7 @@ type configSettings struct {
 type SystemSettings struct {
 	InternalIPs     map[string]string
 	ReportLocations string
+	DeviceIP        string
 	PortNumber      string
 
 	configSettings
@@ -106,6 +107,7 @@ func WriteToFile() {
 	defer w.Flush()
 
 	w.WriteString("[General]\n")
+	w.WriteString("deviceip=" + sysConfig.DeviceIP + "\n")
 	w.WriteString("port=" + sysConfig.PortNumber + "\n")
 
 	w.WriteString("[Internal Addresses]\n")
@@ -182,6 +184,8 @@ func storeValue(line string, sect Section) {
 	} else if sect == General {
 		if str[0] == "port" {
 			sysConfig.PortNumber = str[1]
+		} else if str[0] == "deviceip" {
+			sysConfig.DeviceIP = str[1]
 		}
 	} else if sect == FileLocs {
 		if str[0] == "speedtest" {

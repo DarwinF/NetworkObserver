@@ -30,6 +30,7 @@ var errMsg string = ""
 // Structs for Pages
 //--------------------------------------------
 type configPage struct {
+	DeviceIP      string
 	Port          string
 	InternalAddr  string
 	ExternalAddr  string
@@ -271,6 +272,7 @@ func servePageDynamic(w http.ResponseWriter, r *http.Request, pageName string, d
 
 // Saves the settings to the config file
 func saveConfigToStruct(r *http.Request) {
+	configuration.SetDeviceIP(r.FormValue("deviceip"))
 	configuration.SetInternalIP(ipToMap(r.FormValue("internalip")))
 	configuration.SetReportLocations(r.FormValue("reportfileloc"))
 	configuration.SetPortNumber(r.FormValue("portnumber"))
@@ -285,6 +287,7 @@ func saveConfigToStruct(r *http.Request) {
 
 // Loads the settings from the config file
 func buildConfigStruct(cp *configPage) {
+	cp.DeviceIP = configuration.GetDeviceIP()
 	cp.Port = configuration.GetPortNumber()
 	cp.InternalAddr = configuration.GetInternalIPs()
 	cp.ExternalAddr = configuration.GetExternalIPs()

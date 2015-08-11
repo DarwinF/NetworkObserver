@@ -20,6 +20,13 @@ func SetReportLocations(loc string) {
 	}
 }
 
+func SetDeviceIP(ip string) {
+	if ip != sysConfig.DeviceIP {
+		updated = true
+		sysConfig.DeviceIP = ip
+	}
+}
+
 func SetPortNumber(pn string) {
 	if pn != sysConfig.PortNumber {
 		updated = true

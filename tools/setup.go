@@ -17,6 +17,12 @@ type TestData struct {
 	Speedtest_delay string
 }
 
+type pingResponse struct {
+	internal     bool
+	external_ip  bool
+	external_url bool
+}
+
 func SetupTest(td TestData) (pingInfo, error) {
 	pi := pingInfo{}
 	err := errors.New("")
@@ -50,8 +56,10 @@ func RunTest(pi pingInfo, runlen int) {
 	for time.Now().Before(end) {
 		delay, _ := strconv.Atoi(pi.pingDelay)
 		if time.Now().After(lp.Add(time.Duration(delay) * time.Second)) {
-			Ping()
+			Ping(pi)
 			lp = time.Now()
+
+			// Log response in report xml file
 		}
 		// speedtest -- later
 	}

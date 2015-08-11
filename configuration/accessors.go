@@ -6,6 +6,10 @@ import (
 	"strings"
 )
 
+func GetDeviceIP() string {
+	return sysConfig.DeviceIP
+}
+
 func GetPortNumber() string {
 	return sysConfig.PortNumber
 }

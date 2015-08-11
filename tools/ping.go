@@ -8,6 +8,7 @@
 package tools
 
 import (
+	"NetworkObserver/configuration"
 	"golang.org/x/net/icmp"
 	"golang.org/x/net/internal/iana"
 	"golang.org/x/net/ipv4"
@@ -24,6 +25,7 @@ type pingInfo struct {
 }
 
 var file *os.File
+var device_ip string
 
 func init() {
 	file, _ = os.OpenFile("logfile", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
@@ -34,13 +36,13 @@ func Cleanup() {
 	file.Close()
 }
 
-func Ping() {
-	c, err := icmp.ListenPacket("udp4", "192.168.1.100")
+func Ping(pi pingInfo) pingResponse {
+	c, err := icmp.ListenPacket("udp4", configuration.GetDeviceIP())
 
 	if err != nil {
 		log.Print(err)
 		log.Println()
-		return
+		return pingResponse{}
 	}
 	defer c.Close()
 
@@ -56,13 +58,13 @@ func Ping() {
 	if err != nil {
 		log.Print(err)
 		log.Println()
-		return
+		return pingResponse{}
 	}
 
 	if _, err := c.WriteTo(wb, &net.UDPAddr{IP: net.ParseIP("8.8.8.8"), Zone: "en0"}); err != nil {
 		log.Print(err)
 		log.Println()
-		return
+		return pingResponse{}
 	}
 
 	rb := make([]byte, 1500)
@@ -70,14 +72,14 @@ func Ping() {
 	if err != nil {
 		log.Print(err)
 		log.Println()
-		return
+		return pingResponse{}
 	}
 
 	rm, err := icmp.ParseMessage(iana.ProtocolICMP, rb[:n])
 	if err != nil {
 		log.Print(err)
 		log.Println()
-		return
+		return pingResponse{}
 	}
 
 	switch rm.Type {
@@ -86,4 +88,6 @@ func Ping() {
 	default:
 		log.Printf("got %+v; want echo reply", rm)
 	}
+
+	return pingResponse{}
 }
