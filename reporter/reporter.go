@@ -21,7 +21,3 @@ type ReportData struct {
 	connection
 	speedTest
 }
-
-func NewReport() *ReportData {
-
-}

@@ -19,6 +19,8 @@ import (
 
 var cookieName = "NetObAuth"
 
+var cookieValues []int
+
 var rgen *rand.Rand
 var max = 999999
 var min = 111111
@@ -26,6 +28,8 @@ var min = 111111
 func init() {
 	src := rand.NewSource(time.Now().UnixNano())
 	rgen = rand.New(src)
+
+	cookieValues = make([]int, 0)
 }
 
 // Read the stored usernames and password hashes from the file
@@ -55,7 +59,12 @@ func CheckCredentials(uname string, pword [32]byte) bool {
 
 // Create a cookie with a life of one day
 func SetSessionID(w http.ResponseWriter) {
-	value := rgen.Intn(max-min) + min
+	var value int
+
+	value = rgen.Intn(max-min) + min
+	for used(value) {
+		value = rgen.Intn(max-min) + min
+	}
 
 	expiration := time.Now().Add(time.Duration(24) * time.Hour)
 	cookie := http.Cookie{Name: cookieName, Value: strconv.Itoa(value), Expires: expiration}
@@ -72,6 +81,15 @@ func CheckSessionID(r *http.Request) bool {
 		return checkID(cookie.Value)
 	} else {
 		return false
+	}
+}
+
+func RemoveCookie(w http.ResponseWriter, r *http.Request) {
+	cookie, _ := r.Cookie(cookieName)
+
+	if cookie != nil {
+		cookie.MaxAge = -1
+		http.SetCookie(w, cookie)
 	}
 }
 
@@ -135,4 +153,15 @@ func writeCookieValue(value int) {
 	defer w.Flush()
 
 	w.WriteString(strconv.Itoa(value) + "\n")
+	cookieValues = append(cookieValues, value)
+}
+
+func used(value int) bool {
+	for _, v := range cookieValues {
+		if v == value {
+			return true
+		}
+	}
+
+	return false
 }

@@ -1,6 +1,7 @@
 package configuration
 
 import (
+	"NetworkObserver/logger"
 	"bufio"
 	"os"
 	"strings"
@@ -45,7 +46,7 @@ type SystemSettings struct {
 //--------------------------------
 // Variables
 //--------------------------------
-//var configPath = "sample_config.txt"
+var samplePath = "sample_config.txt"
 var configPath = "config.txt"
 var sysConfig SystemSettings
 
@@ -68,14 +69,27 @@ const (
 // read the .ini file and fill the system struct
 // with the data
 func init() {
+	cf := configPath
+
 	// Setup struct
 	sysConfig = SystemSettings{}
 	sysConfig.InternalIPs = make(map[string]string)
 	sysConfig.ExternalIP = make([]string, 0)
 	sysConfig.ExternalURL = make([]string, 0)
 
-	file, _ := os.Open(configPath)
-	// report error if there is one
+	if _, err := os.Stat(configPath); os.IsNotExist(err) {
+		logger.WriteString("The config file " + configPath + "does not exist. Attempting to locate sample_config.txt")
+		cf = samplePath
+	}
+
+	file, err := os.Open(cf)
+
+	if err != nil {
+		logger.WriteString("The config file " + cf +
+			" could not be found. A config file can be created by editing the configuration page.")
+		return
+	}
+
 	defer file.Close()
 
 	// Set the initial value for sect, this way we have a base

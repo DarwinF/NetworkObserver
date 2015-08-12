@@ -13,6 +13,7 @@ package web
 import (
 	"NetworkObserver/auth"
 	"NetworkObserver/configuration"
+	"NetworkObserver/logger"
 	"NetworkObserver/tools"
 	"crypto/sha256"
 	"html/template"
@@ -91,9 +92,11 @@ func CheckLogin(w http.ResponseWriter, r *http.Request) {
 	authenticated := auth.CheckCredentials(uname, hash)
 
 	if authenticated == true {
+		logger.WriteString("User \"" + uname + "\" authenticated successfully.")
 		auth.SetSessionID(w)
 		http.Redirect(w, r, "/dashboard", http.StatusFound)
 	} else {
+		logger.WriteString("User \"" + uname + "\" did not authenticate successfully.")
 		servePageStatic(w, r, "html/error.html")
 	}
 }
@@ -189,6 +192,12 @@ func TestStarted(w http.ResponseWriter, r *http.Request) {
 	} else {
 		http.Redirect(w, r, "/", http.StatusFound)
 	}
+}
+
+func Logout(w http.ResponseWriter, r *http.Request) {
+	auth.RemoveCookie(w, r)
+
+	http.Redirect(w, r, "/", http.StatusFound)
 }
 
 //--------------------------------------------

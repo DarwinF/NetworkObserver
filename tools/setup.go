@@ -65,6 +65,4 @@ func RunTest(pi pingInfo, runlen int) {
 		}
 		// speedtest -- later
 	}
-
-	Cleanup()
 }

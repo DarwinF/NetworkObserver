@@ -9,15 +9,27 @@ package main
 
 import (
 	"NetworkObserver/configuration"
+	"NetworkObserver/logger"
 	"NetworkObserver/web"
 	"net/http"
+	"os"
 )
 
 // Random default value
 var portNumber string = "5000"
 
 func init() {
-	// Check for configuration file
+	logger.WriteString("Removing the existing .cookies file")
+	os.Remove(".cookies")
+
+	// this is here because apparently auth's init() is called before this one is
+	if _, err := os.Stat(".cookies"); os.IsNotExist(err) {
+		logger.WriteString("Creating a new .cookies file.")
+		file, _ := os.Create(".cookies")
+		file.Close()
+	}
+
+	logger.WriteString("Setting the port number to " + configuration.GetPortNumber())
 	portNumber = ":" + configuration.GetPortNumber()
 }
 
@@ -33,6 +45,7 @@ func main() {
 	http.HandleFunc("/saveConfig", web.SaveConfig)
 	http.HandleFunc("/savetest", web.SaveTest)
 	http.HandleFunc("/teststarted", web.TestStarted)
+	http.HandleFunc("/logout", web.Logout)
 
 	// Dashboard Pages
 	http.HandleFunc("/dashboard/configure", web.Configure)

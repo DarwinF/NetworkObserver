@@ -7,4 +7,5 @@ config.txt
 # ignore the cookie and password storing files
 .cookies
 .password
-logfile
+# ignore the logs
+logs

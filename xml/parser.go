@@ -10,6 +10,7 @@
 package xml
 
 import (
+	"NetworkObserver/logger"
 	"NetworkObserver/reporter"
 	"encoding/xml"
 	"fmt"
@@ -22,7 +23,7 @@ func ReadReport(rd *reporter.ReportData, filePath string) {
 	err := xml.Unmarshal(xmlData, &rd)
 
 	if err != nil {
-		fmt.Printf("error: %v", err)
+		logger.WriteString("There was an error unmarshalling the XML")
 		return
 	}
 }

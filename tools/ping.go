@@ -9,11 +9,11 @@ package tools
 
 import (
 	"NetworkObserver/configuration"
+	"NetworkObserver/logger"
 	"errors"
 	"golang.org/x/net/icmp"
 	"golang.org/x/net/internal/iana"
 	"golang.org/x/net/ipv4"
-	"log"
 	"net"
 	"os"
 	"strconv"
@@ -27,18 +27,7 @@ type pingInfo struct {
 	externalurl string
 }
 
-var file *os.File
 var sequence int = 1
-
-func init() {
-	file, _ = os.OpenFile("logfile", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
-	log.SetOutput(file)
-	log.Println("-+--------------------------------------------+-")
-}
-
-func Cleanup() {
-	file.Close()
-}
 
 func Ping(pi pingInfo) pingResponse {
 	pr := pingResponse{}
@@ -48,7 +37,7 @@ func Ping(pi pingInfo) pingResponse {
 
 	if err != nil {
 		msg := "Could not create a packet endpoint to listen on."
-		log.Println(msg)
+		logger.WriteString(msg)
 		pr.err = errors.New(msg)
 		return pr
 	}
@@ -58,9 +47,6 @@ func Ping(pi pingInfo) pingResponse {
 	testNetwork(&pr, pi, conn)
 	testInternet(&pr, pi, conn)
 	testDNS(&pr, pi, conn)
-
-	// Just a little seperator
-	log.Println("-+--------------------------------------------+-")
 
 	sequence++
 	return pr
@@ -74,14 +60,14 @@ func testNetwork(pr *pingResponse, pi pingInfo, conn *icmp.PacketConn) {
 	msg_bytes, err := msg.Marshal(nil)
 	if err != nil {
 		emsg := "Could not marshal the message to []byte."
-		log.Println(emsg)
+		logger.WriteString(emsg)
 		pr.err = errors.New(emsg)
 		return
 	}
 
 	if _, err := conn.WriteTo(msg_bytes, &net.UDPAddr{IP: net.ParseIP(pi.internalip), Zone: "en0"}); err != nil {
 		emsg := "Could not write to the internal ip address: " + pi.internalip
-		log.Println(emsg)
+		logger.WriteString(emsg)
 		pr.internal = false
 		pr.err = errors.New(emsg)
 		return
@@ -93,7 +79,7 @@ func testNetwork(pr *pingResponse, pi pingInfo, conn *icmp.PacketConn) {
 	count, peer, err := conn.ReadFrom(response)
 	if err != nil {
 		emsg := "Could not read the response."
-		log.Println(emsg)
+		logger.WriteString(emsg)
 		pr.internal = false
 		pr.err = errors.New(emsg)
 		return
@@ -102,13 +88,13 @@ func testNetwork(pr *pingResponse, pi pingInfo, conn *icmp.PacketConn) {
 	_, err = icmp.ParseMessage(iana.ProtocolICMP, response[:count])
 	if err != nil {
 		emsg := "Could not parse the message received."
-		log.Println(emsg)
+		logger.WriteString(emsg)
 		pr.internal = false
 		pr.err = errors.New(emsg)
 		return
 	}
 
-	log.Println("Response " + strconv.Itoa(sequence) + " received from " + peer.String() +
+	logger.WriteString("Response " + strconv.Itoa(sequence) + " received from " + peer.String() +
 		" after " + time.Now().Sub(start).String())
 }
 
@@ -120,7 +106,7 @@ func testDNS(pr *pingResponse, pi pingInfo, conn *icmp.PacketConn) {
 	msg_bytes, err := msg.Marshal(nil)
 	if err != nil {
 		emsg := "Could not marshal the message to []byte."
-		log.Println(emsg)
+		logger.WriteString(emsg)
 		pr.err = errors.New(emsg)
 		return
 	}
@@ -129,7 +115,7 @@ func testDNS(pr *pingResponse, pi pingInfo, conn *icmp.PacketConn) {
 
 	if _, err := conn.WriteTo(msg_bytes, &net.UDPAddr{IP: net.ParseIP(ip[0]), Zone: "en0"}); err != nil {
 		emsg := "Could not write to the internal ip address: " + ip[0]
-		log.Println(emsg)
+		logger.WriteString(emsg)
 		pr.external_url = false
 		pr.err = errors.New(emsg)
 		return
@@ -141,7 +127,7 @@ func testDNS(pr *pingResponse, pi pingInfo, conn *icmp.PacketConn) {
 	count, peer, err := conn.ReadFrom(response)
 	if err != nil {
 		emsg := "Could not read the response."
-		log.Println(emsg)
+		logger.WriteString(emsg)
 		pr.external_url = false
 		pr.err = errors.New(emsg)
 		return
@@ -150,13 +136,13 @@ func testDNS(pr *pingResponse, pi pingInfo, conn *icmp.PacketConn) {
 	_, err = icmp.ParseMessage(iana.ProtocolICMP, response[:count])
 	if err != nil {
 		emsg := "Could not parse the message received."
-		log.Println(emsg)
+		logger.WriteString(emsg)
 		pr.external_url = false
 		pr.err = errors.New(emsg)
 		return
 	}
 
-	log.Println("Response " + strconv.Itoa(sequence) + " received from " + peer.String() +
+	logger.WriteString("Response " + strconv.Itoa(sequence) + " received from " + peer.String() +
 		" after " + time.Now().Sub(start).String())
 }
 
@@ -168,14 +154,14 @@ func testInternet(pr *pingResponse, pi pingInfo, conn *icmp.PacketConn) {
 	msg_bytes, err := msg.Marshal(nil)
 	if err != nil {
 		emsg := "Could not marshal the message to []byte."
-		log.Println(emsg)
+		logger.WriteString(emsg)
 		pr.err = errors.New(emsg)
 		return
 	}
 
 	if _, err := conn.WriteTo(msg_bytes, &net.UDPAddr{IP: net.ParseIP(pi.externalip), Zone: "en0"}); err != nil {
 		emsg := "Could not write to the external ip address: " + pi.externalip
-		log.Println(emsg)
+		logger.WriteString(emsg)
 		pr.external_ip = false
 		pr.err = errors.New(emsg)
 		return
@@ -187,7 +173,7 @@ func testInternet(pr *pingResponse, pi pingInfo, conn *icmp.PacketConn) {
 	count, peer, err := conn.ReadFrom(response)
 	if err != nil {
 		emsg := "Could not read the response."
-		log.Println(emsg)
+		logger.WriteString(emsg)
 		pr.external_ip = false
 		pr.err = errors.New(emsg)
 		return
@@ -196,13 +182,13 @@ func testInternet(pr *pingResponse, pi pingInfo, conn *icmp.PacketConn) {
 	_, err = icmp.ParseMessage(iana.ProtocolICMP, response[:count])
 	if err != nil {
 		emsg := "Could not parse the message received."
-		log.Println(emsg)
+		logger.WriteString(emsg)
 		pr.external_ip = false
 		pr.err = errors.New(emsg)
 		return
 	}
 
-	log.Println("Response " + strconv.Itoa(sequence) + " received from " + peer.String() +
+	logger.WriteString("Response " + strconv.Itoa(sequence) + " received from " + peer.String() +
 		" after " + time.Now().Sub(start).String())
 }
 

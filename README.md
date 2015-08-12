@@ -3,6 +3,10 @@
 Observes a network connection testing connectivity and network speed.
 
 ## Changelog
+### Version 0.0.13
+* Wrote a simple logging interface so all components can log to one file
+* Resolved issue #5 - A user can logout of the application now and the cookie is deleted
+
 ### Version 0.0.12
 * Ping now works as it is supposed to
 
