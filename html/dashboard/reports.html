@@ -2,22 +2,22 @@
 <html>
 <head>
 	<title>Network Observer Reports</title>
+	<link rel="stylesheet" type="text/css" href="login.css">
+	<meta http-equiv="refresh" content="10; url=/dashboard/reports">
 </head>
 <body>
 	<h4>Network Observer Reports</h4>
 	<a href="/logout">Logout</a>
 	<a href="/dasboard">Dashboard</a>
-	<p>34 Reports <b>(1 Running)</b></p>
 	<br>
-	<p>Report One - Running</p>
-	<p>Report One</p>
-	<p>Report One</p>
-	<p>Report One</p>
-	<p>Report One</p>
-	<p>Report One</p>
-	<p>Report One</p>
-	<p>Report One</p>
-	<p>Report One</p>
-	<p>Report One</p>
+	<p>Location: {{.Location}}</p>
+	<p>Start Time: {{.StartTime}}</p>
+	<br>
+	<p>Uptime: {{.Uptime}}</p>
+	<p>Last Connection: {{.LastConnect}}</p>
+	<p>Disconnection Count: {{.DisconnectCount}}</p>
+	<p>Timeline:</p>
+	<pre>{{.Timeline}}</pre>
+	<br>
 </body>
 </html>

@@ -1,5 +1,10 @@
 package reporter
 
+import (
+	"NetworkObserver/logger"
+	"os"
+)
+
 type connection struct {
 	Uptime          string `xml:"Connection>Uptime"`
 	LastConnect     string `xml:"Connection>LastConnect"`
@@ -20,4 +25,18 @@ type ReportData struct {
 	Graph     string
 	connection
 	speedTest
+}
+
+var file *os.File
+var rd ReportData
+
+func init() {
+	var err error
+	file, err = os.OpenFile("report.xml", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+
+	if err != nil {
+		logger.WriteString("There was a problem opening the report.xml file")
+	}
+
+	rd = ReportData{}
 }

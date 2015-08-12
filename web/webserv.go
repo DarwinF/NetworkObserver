@@ -14,12 +14,14 @@ import (
 	"NetworkObserver/auth"
 	"NetworkObserver/configuration"
 	"NetworkObserver/logger"
+	"NetworkObserver/reporter"
 	"NetworkObserver/tools"
 	"crypto/sha256"
 	"html/template"
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 )
 
 //--------------------------------------------
@@ -174,9 +176,12 @@ func SaveTest(w http.ResponseWriter, r *http.Request) {
 				http.Redirect(w, r, "/dashboard/start_test", http.StatusFound)
 			}
 
+			reporter.SetStartTime(time.Now().Format("Jan 02, 2006 - 15:04"))
+			reporter.SetLocation(td.Location)
+
 			runlen, _ := strconv.Atoi(td.Runlen)
 			go tools.RunTest(pi, runlen)
-			http.Redirect(w, r, "/dashboard", http.StatusFound)
+			http.Redirect(w, r, "/dashboard/reports", http.StatusFound)
 		}
 	} else {
 		http.Redirect(w, r, "/", http.StatusFound)
@@ -257,7 +262,9 @@ func Reports(w http.ResponseWriter, r *http.Request) {
 	valid := auth.CheckSessionID(r)
 
 	if valid {
-		servePageStatic(w, r, "html/dashboard/reports.html")
+		rd := reporter.ReportData{}
+		buildReport(&rd)
+		servePageDynamic(w, r, "html/dashboard/reports.html", rd)
 	} else {
 		http.Redirect(w, r, "/", http.StatusFound)
 	}
@@ -311,6 +318,16 @@ func buildTestStruct(ts *testPage) {
 	ts.PingDelay = configuration.GetPingDelay()
 	ts.SpeedTestDelay = configuration.GetSpeedDelay()
 	ts.SpeedTestFileLocation = configuration.GetSpeedFileLocation()
+}
+
+func buildReport(r *reporter.ReportData) {
+	r.Uptime = reporter.GetUptime()
+	r.LastConnect = reporter.GetLastConnect()
+	r.DisconnectCount = reporter.GetDisconnectCount()
+	r.Timeline = reporter.GetTimeline()
+	r.Status = reporter.GetStatus()
+	r.Location = reporter.GetLocation()
+	r.StartTime = reporter.GetStartTime()
 }
 
 // Converts a textarea into a slice with one
