@@ -29,13 +29,19 @@ type ReportData struct {
 
 var file *os.File
 var rd ReportData
-var loc string = "/var/lib/apps/NetworkObserver/Reports/report.xml"
+var loc string = "/var/lib/apps/NetworkObserver.sideload/0.1/Reports/"
+var rf string = loc + "report.xml"
 
 func init() {
-	var err error
-	file, err = os.OpenFile(loc, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	if _, err := os.Stat(loc); os.IsNotExist(err) {
+		logger.WriteString("The reports folder does not exist. Creating the folder now.")
+		os.Mkdir(loc, 0777)
+	}
 
-	if err != nil {
+	var e error
+	file, e = os.OpenFile(rf, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+
+	if e != nil {
 		logger.WriteString("There was a problem opening the report.xml file")
 	}
 

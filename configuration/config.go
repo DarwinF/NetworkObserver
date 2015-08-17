@@ -46,9 +46,10 @@ type SystemSettings struct {
 //--------------------------------
 // Variables
 //--------------------------------
-var samplePath string = "config.txt.sample"
-var configPath string = "config.txt"
-var loc string = "/var/lib/apps/NetworkObserver/"
+var samplePath string = "config.txt.example"
+var loc string = "/var/lib/apps/NetworkObserver.sideload/"
+var version string = "0.1"
+var configPath string = loc + version + "config.txt"
 var sysConfig SystemSettings
 
 var updated = false
@@ -70,7 +71,7 @@ const (
 // read the .ini file and fill the system struct
 // with the data
 func init() {
-	cf := loc + configPath
+	cf := configPath
 
 	// Setup struct
 	sysConfig = SystemSettings{}
@@ -80,7 +81,7 @@ func init() {
 
 	if _, err := os.Stat(cf); os.IsNotExist(err) {
 		logger.WriteString("The config file " + cf + "does not exist. Attempting to locate sample_config.txt")
-		cf = loc + samplePath
+		cf = samplePath
 	}
 
 	file, err := os.Open(cf)
@@ -115,7 +116,7 @@ func WriteToFile() {
 		return
 	}
 
-	file, _ := os.Create(loc + configPath)
+	file, _ := os.Create(configPath)
 	defer file.Close()
 
 	w := bufio.NewWriter(file)
