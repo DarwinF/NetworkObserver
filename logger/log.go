@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-var logloc string = "logs"
+var logloc string = "/var/lib/apps/NetworkObserver/Logs"
 
 func init() {
 	// Check if the log folder exists

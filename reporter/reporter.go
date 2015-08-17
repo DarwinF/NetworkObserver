@@ -29,10 +29,11 @@ type ReportData struct {
 
 var file *os.File
 var rd ReportData
+var loc string = "/var/lib/apps/NetworkObserver/Reports/report.xml"
 
 func init() {
 	var err error
-	file, err = os.OpenFile("report.xml", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	file, err = os.OpenFile(loc, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 
 	if err != nil {
 		logger.WriteString("There was a problem opening the report.xml file")

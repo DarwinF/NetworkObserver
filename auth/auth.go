@@ -17,7 +17,8 @@ import (
 	"time"
 )
 
-var cookieName = "NetObAuth"
+var cookieName string = "NetObAuth"
+var loc string = "/var/lib/apps/NetworkObserver/"
 
 var cookieValues []int
 
@@ -35,7 +36,7 @@ func init() {
 // Read the stored usernames and password hashes from the file
 func CheckCredentials(uname string, pword [32]byte) bool {
 	valid := false
-	file, _ := os.Open(".password")
+	file, _ := os.Open(loc + ".password")
 	defer file.Close()
 
 	pws := string(pword[:])
@@ -97,7 +98,7 @@ func RemoveCookie(w http.ResponseWriter, r *http.Request) {
 func checkID(value string) bool {
 	valid := false
 
-	file, _ := os.Open(".cookies")
+	file, _ := os.Open(loc + ".cookies")
 	defer file.Close()
 
 	scanner := bufio.NewScanner(file)
@@ -117,7 +118,7 @@ func checkID(value string) bool {
 func UsernameInUse(uname string) bool {
 	used := false
 
-	file, _ := os.Open(".password")
+	file, _ := os.Open(loc + ".password")
 	defer file.Close()
 
 	scanner := bufio.NewScanner(file)
@@ -136,7 +137,7 @@ func UsernameInUse(uname string) bool {
 }
 
 func SavePassword(uname string, pword [32]byte) {
-	file, _ := os.OpenFile(".password", os.O_APPEND|os.O_WRONLY, 0600)
+	file, _ := os.OpenFile(loc+".password", os.O_APPEND|os.O_WRONLY, 0600)
 	defer file.Close()
 
 	w := bufio.NewWriter(file)
@@ -146,7 +147,7 @@ func SavePassword(uname string, pword [32]byte) {
 }
 
 func writeCookieValue(value int) {
-	file, _ := os.OpenFile(".cookies", os.O_APPEND|os.O_WRONLY, 0600)
+	file, _ := os.OpenFile(loc+".cookies", os.O_APPEND|os.O_WRONLY, 0600)
 	defer file.Close()
 
 	w := bufio.NewWriter(file)

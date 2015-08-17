@@ -17,15 +17,16 @@ import (
 
 // Random default value
 var portNumber string = "5000"
+var loc string = "/var/lib/apps/NetworkObserver/"
 
 func init() {
 	logger.WriteString("Removing the existing .cookies file")
-	os.Remove(".cookies")
+	os.Remove(loc + ".cookies")
 
 	// this is here because apparently auth's init() is called before this one is
-	if _, err := os.Stat(".cookies"); os.IsNotExist(err) {
+	if _, err := os.Stat(loc + ".cookies"); os.IsNotExist(err) {
 		logger.WriteString("Creating a new .cookies file.")
-		file, _ := os.Create(".cookies")
+		file, _ := os.Create(loc + ".cookies")
 		file.Close()
 	}
 
