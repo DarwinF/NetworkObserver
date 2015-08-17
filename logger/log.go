@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-var logloc string = "~/.NetworkObserver/Logs/"
+var logloc string = "/home/ubuntu/.NetworkObserver/Logs"
 
 func init() {
 	// Check if the log folder exists
@@ -41,9 +41,9 @@ func exists(path string) (bool, error) {
 }
 
 func WriteString(s string) {
-	filename := logloc + time.Now().Format("01-02-2006") + ".log"
+	filename := logloc + "/" + time.Now().Format("01-02-2006") + ".log"
 
-	file, err := os.OpenFile(filename, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	file, err := os.Create(filename)
 	defer file.Close()
 
 	if err != nil {
