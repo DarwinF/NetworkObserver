@@ -46,10 +46,9 @@ type SystemSettings struct {
 //--------------------------------
 // Variables
 //--------------------------------
-var samplePath string = "config.txt.example"
-var loc string = "/var/lib/apps/NetworkObserver.sideload/"
-var version string = "0.1"
-var configPath string = loc + version + "config.txt"
+var samplePath string = "../config.txt.example"
+var loc string = "~/.NetworkObserver/"
+var configPath string = loc + "config.txt"
 var sysConfig SystemSettings
 
 var updated = false
@@ -80,7 +79,7 @@ func init() {
 	sysConfig.ExternalURL = make([]string, 0)
 
 	if _, err := os.Stat(cf); os.IsNotExist(err) {
-		logger.WriteString("The config file " + cf + "does not exist. Attempting to locate sample_config.txt")
+		logger.WriteString("The config file " + cf + " does not exist. Attempting to locate config.txt.example")
 		cf = samplePath
 	}
 

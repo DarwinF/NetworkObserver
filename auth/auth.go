@@ -18,10 +18,9 @@ import (
 )
 
 var cookieName string = "NetObAuth"
-var loc string = "/var/lib/apps/NetworkObserver.sideload/"
-var version string = "0.1"
-var pwloc string = loc + version + ".password"
-var cloc string = loc + version + ".cookies"
+var loc string = "~/.NetworkObserver/"
+var pwloc string = loc + ".password"
+var cloc string = loc + ".cookies"
 
 var cookieValues []int
 

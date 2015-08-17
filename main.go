@@ -17,11 +17,10 @@ import (
 
 // Random default value
 var portNumber string = "5000"
-var loc string = "/var/lib/apps/NetworkObserver.sideload/"
-var version string = "0.1"
+var loc string = "~/.NetworkObserver/"
 
 func init() {
-	cl := loc + version + ".cookies"
+	cl := loc + ".cookies"
 	logger.WriteString("Removing the existing .cookies file")
 	os.Remove(cl)
 

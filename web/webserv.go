@@ -67,7 +67,7 @@ func Root(w http.ResponseWriter, r *http.Request) {
 	if valid {
 		http.Redirect(w, r, "/dashboard", http.StatusFound)
 	} else {
-		servePageStatic(w, r, "html/login.html")
+		servePageStatic(w, r, "../html/login.html")
 	}
 }
 
@@ -76,7 +76,7 @@ func Dashboard(w http.ResponseWriter, r *http.Request) {
 	valid := auth.CheckSessionID(r)
 
 	if valid {
-		servePageStatic(w, r, "html/dashboard.html")
+		servePageStatic(w, r, "../html/dashboard.html")
 	} else {
 		http.Redirect(w, r, "/", http.StatusFound)
 	}
@@ -99,14 +99,14 @@ func CheckLogin(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/dashboard", http.StatusFound)
 	} else {
 		logger.WriteString("User \"" + uname + "\" did not authenticate successfully.")
-		servePageStatic(w, r, "html/error.html")
+		servePageStatic(w, r, "../html/error.html")
 	}
 }
 
 // Create a new account by comparing both of the passwords
 // entered and then hashing and storing the password
 func CreateAccount(w http.ResponseWriter, r *http.Request) {
-	servePageStatic(w, r, "html/createaccount.html")
+	servePageStatic(w, r, "../html/createaccount.html")
 }
 
 // Serve the webpage for creating an account
@@ -119,21 +119,21 @@ func HandleAccount(w http.ResponseWriter, r *http.Request) {
 		ca := createAccount{}
 		ca.Msg = "The username " + un + " is currently in use."
 		ca.Username = ""
-		servePageDynamic(w, r, "html/createaccount.html", ca)
+		servePageDynamic(w, r, "../html/createaccount.html", ca)
 	} else if un == "" {
 		ca := createAccount{}
 		ca.Msg = "You must enter a username."
 		ca.Username = ""
-		servePageDynamic(w, r, "html/createaccount.html", ca)
+		servePageDynamic(w, r, "../html/createaccount.html", ca)
 	} else if pw != pwv || pw == "" || pwv == "" {
 		ca := createAccount{}
 		ca.Msg = "The passwords do not match."
 		ca.Username = un
-		servePageDynamic(w, r, "html/createaccount.html", ca)
+		servePageDynamic(w, r, "../html/createaccount.html", ca)
 	} else if pw == pwv {
 		h := sha256.Sum256([]byte(pw))
 		auth.SavePassword(un, h)
-		servePageStatic(w, r, "html/success.html")
+		servePageStatic(w, r, "../html/success.html")
 	}
 }
 
@@ -193,7 +193,7 @@ func TestStarted(w http.ResponseWriter, r *http.Request) {
 	valid := auth.CheckSessionID(r)
 
 	if valid {
-		servePageStatic(w, r, "html/dashboard/testnotify.html")
+		servePageStatic(w, r, "../html/dashboard/testnotify.html")
 	} else {
 		http.Redirect(w, r, "/", http.StatusFound)
 	}
@@ -217,7 +217,7 @@ func Settings(w http.ResponseWriter, r *http.Request) {
 	valid := auth.CheckSessionID(r)
 
 	if valid {
-		servePageStatic(w, r, "html/dashboard/settings.html")
+		servePageStatic(w, r, "../html/dashboard/settings.html")
 	} else {
 		http.Redirect(w, r, "/", http.StatusFound)
 	}
@@ -231,7 +231,7 @@ func Configure(w http.ResponseWriter, r *http.Request) {
 	buildConfigStruct(&configStruct)
 
 	if valid {
-		servePageDynamic(w, r, "html/dashboard/config.html", configStruct)
+		servePageDynamic(w, r, "../html/dashboard/config.html", configStruct)
 	} else {
 		http.Redirect(w, r, "/", http.StatusFound)
 	}
@@ -252,7 +252,7 @@ func StartTest(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if valid {
-		servePageDynamic(w, r, "html/dashboard/starttest.html", ts)
+		servePageDynamic(w, r, "../html/dashboard/starttest.html", ts)
 	} else {
 		http.Redirect(w, r, "/", http.StatusFound)
 	}
@@ -264,7 +264,7 @@ func Reports(w http.ResponseWriter, r *http.Request) {
 	if valid {
 		rd := reporter.ReportData{}
 		buildReport(&rd)
-		servePageDynamic(w, r, "html/dashboard/reports.html", rd)
+		servePageDynamic(w, r, "../html/dashboard/reports.html", rd)
 	} else {
 		http.Redirect(w, r, "/", http.StatusFound)
 	}
