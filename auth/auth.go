@@ -38,7 +38,7 @@ func init() {
 // Read the stored usernames and password hashes from the file
 func CheckCredentials(uname string, pword [32]byte) bool {
 	valid := false
-	file, _ := os.OpenFile(pwloc, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0600)
+	file, _ := os.Open(pwloc)
 	defer file.Close()
 
 	pws := string(pword[:])
@@ -100,7 +100,7 @@ func RemoveCookie(w http.ResponseWriter, r *http.Request) {
 func checkID(value string) bool {
 	valid := false
 
-	file, _ := os.OpenFile(cloc, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0600)
+	file, _ := os.Open(cloc)
 	defer file.Close()
 
 	scanner := bufio.NewScanner(file)
@@ -120,7 +120,7 @@ func checkID(value string) bool {
 func UsernameInUse(uname string) bool {
 	used := false
 
-	file, _ := os.OpenFile(pwloc, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
+	file, _ := os.Open(pwloc)
 	defer file.Close()
 
 	scanner := bufio.NewScanner(file)
@@ -139,7 +139,7 @@ func UsernameInUse(uname string) bool {
 }
 
 func SavePassword(uname string, pword [32]byte) {
-	file, _ := os.OpenFile(pwloc, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
+	file, _ := os.OpenFile(pwloc, os.O_APPEND|os.O_WRONLY, 0600)
 	defer file.Close()
 
 	w := bufio.NewWriter(file)
@@ -149,7 +149,7 @@ func SavePassword(uname string, pword [32]byte) {
 }
 
 func writeCookieValue(value int) {
-	file, _ := os.OpenFile(cloc, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
+	file, _ := os.OpenFile(cloc, os.O_APPEND|os.O_WRONLY, 0600)
 	defer file.Close()
 
 	w := bufio.NewWriter(file)
