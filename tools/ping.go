@@ -36,7 +36,7 @@ func Ping(pi pingInfo) pingResponse {
 	conn, err := icmp.ListenPacket("udp4", configuration.GetDeviceIP())
 
 	if err != nil {
-		msg := "Could not create a packet endpoint to listen on."
+		msg := "Could not create a packet endpoint on ip: " + configuration.GetDeviceIP()
 		logger.WriteString(msg)
 		pr.err = errors.New(msg)
 		return pr
