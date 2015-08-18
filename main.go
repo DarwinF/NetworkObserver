@@ -31,6 +31,12 @@ func init() {
 		file.Close()
 	}
 
+	if _, err := os.Stat(loc + ".password"); os.IsNotExist(err) {
+		logger.WriteString("The .password file does not exist. Creating a new .password file.")
+		file, _ := os.Create(loc + ".password")
+		file.Close()
+	}
+
 	logger.WriteString("Setting the port number to " + configuration.GetPortNumber())
 	portNumber = ":" + configuration.GetPortNumber()
 }
