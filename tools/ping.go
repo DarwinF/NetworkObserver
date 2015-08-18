@@ -37,6 +37,7 @@ func Ping(pi pingInfo) pingResponse {
 
 	if err != nil {
 		msg := "Could not create a packet endpoint on ip: " + configuration.GetDeviceIP()
+		fmt.Println(err)
 		logger.WriteString(msg)
 		pr.err = errors.New(msg)
 		return pr
