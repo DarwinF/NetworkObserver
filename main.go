@@ -17,7 +17,7 @@ import (
 
 // Random default value
 var portNumber string = "5000"
-var loc string = "~/.NetworkObserver/"
+var loc string = "/home/ubuntu/.NetworkObserver/"
 
 func init() {
 	cl := loc + ".cookies"
