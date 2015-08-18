@@ -29,7 +29,7 @@ type ReportData struct {
 
 var file *os.File
 var rd ReportData
-var loc string = "~/.NetworkObserver/Reports/"
+var loc string = "/home/ubuntu/.NetworkObserver/Reports/"
 var rf string = loc + "report.xml"
 
 func init() {

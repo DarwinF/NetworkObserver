@@ -47,7 +47,7 @@ type SystemSettings struct {
 // Variables
 //--------------------------------
 var samplePath string = "../config.txt.example"
-var loc string = "~/.NetworkObserver/"
+var loc string = "/home/ubuntu/.NetworkObserver/"
 var configPath string = loc + "config.txt"
 var sysConfig SystemSettings
 

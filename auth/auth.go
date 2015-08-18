@@ -18,7 +18,7 @@ import (
 )
 
 var cookieName string = "NetObAuth"
-var loc string = "~/.NetworkObserver/"
+var loc string = "/home/ubuntu/.NetworkObserver/"
 var pwloc string = loc + ".password"
 var cloc string = loc + ".cookies"
 
