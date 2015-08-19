@@ -26,7 +26,7 @@ func init() {
 		os.Mkdir(loc, 0600)
 	}
 
-	cl := loc + ".cookies"
+	cl := loc + "/.cookies"
 	logger.WriteString("Removing the existing .cookies file")
 	os.Remove(cl)
 
@@ -37,7 +37,7 @@ func init() {
 		file.Close()
 	}
 
-	if _, err := os.Stat(loc + ".password"); os.IsNotExist(err) {
+	if _, err := os.Stat(loc + "/.password"); os.IsNotExist(err) {
 		logger.WriteString("The .password file does not exist. Creating a new .password file.")
 		file, _ := os.Create(loc + ".password")
 		file.Close()
