@@ -21,8 +21,8 @@ import (
 var cookieName string = "NetObAuth"
 
 var loc string = settings.AppLocation
-var pwloc string = loc + ".password"
-var cloc string = loc + ".cookies"
+var pwloc string = loc + "/.password"
+var cloc string = loc + "/.cookies"
 
 var cookieValues []int
 

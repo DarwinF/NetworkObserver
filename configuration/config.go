@@ -2,7 +2,7 @@ package configuration
 
 import (
 	"NetworkObserver/logger"
-	"NteworkObserver/settings"
+	"NetworkObserver/settings"
 	"bufio"
 	"os"
 	"strings"
@@ -47,9 +47,9 @@ type SystemSettings struct {
 //--------------------------------
 // Variables
 //--------------------------------
-var samplePath string = "../config.txt.example"
-var loc string = settings.Applocation
-var configPath string = loc + "config.txt"
+var loc string = settings.AppLocation
+var samplePath string = loc + "/config.txt.example"
+var configPath string = loc + "/config.txt"
 var sysConfig SystemSettings
 
 var updated = false
