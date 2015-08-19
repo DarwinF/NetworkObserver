@@ -11,6 +11,7 @@ import (
 	"NetworkObserver/configuration"
 	"NetworkObserver/logger"
 	"errors"
+	"fmt"
 	"golang.org/x/net/icmp"
 	"golang.org/x/net/internal/iana"
 	"golang.org/x/net/ipv4"

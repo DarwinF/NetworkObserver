@@ -43,7 +43,6 @@ func exists(path string) (bool, error) {
 func WriteString(s string) {
 	filename := logloc + "/" + time.Now().Format("01-02-2006") + ".log"
 
-	// TODO: Don't create a brand new file every time...
 	file, err := os.OpenFile(filename, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0600)
 	defer file.Close()
 
