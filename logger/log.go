@@ -44,7 +44,7 @@ func exists(path string) (bool, error) {
 func WriteString(s string) {
 	filename := logloc + "/" + time.Now().Format("01-02-2006") + ".log"
 
-	file, err := os.OpenFile(filename, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0600)
+	file, err := os.OpenFile(filename, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
 	defer file.Close()
 
 	if err != nil {

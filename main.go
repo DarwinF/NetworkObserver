@@ -21,11 +21,6 @@ var portNumber string = "5000"
 var loc string = settings.AppLocation
 
 func init() {
-	// Check if the application directory exists, create it if it doesn't
-	if _, err := os.Stat(loc); os.IsNotExist(err) {
-		os.Mkdir(loc, 0600)
-	}
-
 	cl := loc + "/.cookies"
 	logger.WriteString("Removing the existing .cookies file")
 	os.Remove(cl)
@@ -42,7 +37,7 @@ func init() {
 
 	if _, err := os.Stat(loc + "/.password"); os.IsNotExist(err) {
 		logger.WriteString("The .password file does not exist. Creating a new .password file.")
-		file, e := os.Create(loc + ".password")
+		file, e := os.Create(loc + "/.password")
 		if e != nil {
 			logger.WriteString("There was an error creating the .password file.")
 		}
