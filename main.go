@@ -33,13 +33,19 @@ func init() {
 	// this is here because apparently auth's init() is called before this one is
 	if _, err := os.Stat(cl); os.IsNotExist(err) {
 		logger.WriteString("Creating a new .cookies file.")
-		file, _ := os.Create(cl)
+		file, e := os.Create(cl)
+		if e != nil {
+			logger.WriteString("There was an error creating the .cookies file.")
+		}
 		file.Close()
 	}
 
 	if _, err := os.Stat(loc + "/.password"); os.IsNotExist(err) {
 		logger.WriteString("The .password file does not exist. Creating a new .password file.")
-		file, _ := os.Create(loc + ".password")
+		file, e := os.Create(loc + ".password")
+		if e != nil {
+			logger.WriteString("There was an error creating the .password file.")
+		}
 		file.Close()
 	}
 
