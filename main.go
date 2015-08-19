@@ -10,6 +10,7 @@ package main
 import (
 	"NetworkObserver/configuration"
 	"NetworkObserver/logger"
+	"NetworkObserver/settings"
 	"NetworkObserver/web"
 	"net/http"
 	"os"
@@ -17,9 +18,14 @@ import (
 
 // Random default value
 var portNumber string = "5000"
-var loc string = "/home/ubuntu/.NetworkObserver/"
+var loc string = settings.AppLocation
 
 func init() {
+	// Check if the application directory exists, create it if it doesn't
+	if _, err := os.Stat(loc); os.IsNotExist(err) {
+		os.Mkdir(loc, 0600)
+	}
+
 	cl := loc + ".cookies"
 	logger.WriteString("Removing the existing .cookies file")
 	os.Remove(cl)

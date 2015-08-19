@@ -2,6 +2,7 @@ package reporter
 
 import (
 	"NetworkObserver/logger"
+	"NetworkObserver/settings"
 	"os"
 )
 
@@ -29,7 +30,7 @@ type ReportData struct {
 
 var file *os.File
 var rd ReportData
-var loc string = "/home/ubuntu/.NetworkObserver/Reports/"
+var loc string = settings.AppLocation + "/Reports/"
 var rf string = loc + "report.xml"
 
 func init() {

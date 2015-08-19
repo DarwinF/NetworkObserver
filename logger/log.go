@@ -1,13 +1,14 @@
 package logger
 
 import (
+	"NetworkObserver/settings"
 	"fmt"
 	"log"
 	"os"
 	"time"
 )
 
-var logloc string = "/home/ubuntu/.NetworkObserver/Logs"
+var logloc string = settings.AppLocation + "/Logs"
 
 func init() {
 	// Check if the log folder exists

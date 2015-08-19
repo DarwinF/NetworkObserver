@@ -8,6 +8,7 @@
 package auth
 
 import (
+	"NetworkObserver/settings"
 	"bufio"
 	"math/rand"
 	"net/http"
@@ -19,7 +20,7 @@ import (
 
 var cookieName string = "NetObAuth"
 
-var loc string = "/home/ubuntu/.NetworkObserver/"
+var loc string = settings.AppLocation
 var pwloc string = loc + ".password"
 var cloc string = loc + ".cookies"
 
