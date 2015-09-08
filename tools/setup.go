@@ -2,6 +2,7 @@ package tools
 
 import (
 	"NetworkObserver/configuration"
+	"NetworkObserver/logger"
 	"NetworkObserver/reporter"
 	"errors"
 	"strconv"
@@ -71,6 +72,8 @@ func RunTest(pi pingInfo, runlen int) {
 	lp := time.Now()
 	end := time.Now().Add(time.Duration(runlen) * time.Hour)
 
+	logger.WriteString("Starting the test...")
+
 	for time.Now().Before(end) {
 		delay, _ := strconv.Atoi(pi.pingDelay)
 		if time.Now().After(lp.Add(time.Duration(delay) * time.Second)) {
@@ -96,4 +99,6 @@ func RunTest(pi pingInfo, runlen int) {
 		}
 		// speedtest -- later
 	}
+
+	logger.WriteString("The test has been completed.")
 }

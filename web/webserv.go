@@ -182,6 +182,7 @@ func SaveTest(w http.ResponseWriter, r *http.Request) {
 			reporter.SetLocation(td.Location)
 
 			runlen, _ := strconv.Atoi(td.Runlen)
+			logger.WriteString("Running test for: " + td.Runlen)
 			go tools.RunTest(pi, runlen)
 			http.Redirect(w, r, "/dashboard/reports", http.StatusFound)
 		}

@@ -46,9 +46,13 @@ func Ping(pi pingInfo) pingResponse {
 
 	defer conn.Close()
 
+	logger.WriteString("Starting test number " + strconv.Itoa(sequence))
+
 	testNetwork(&pr, pi, conn)
 	testInternet(&pr, pi, conn)
 	testDNS(&pr, pi, conn)
+
+	logger.WriteString("Finished test number " + strconv.Itoa(sequence))
 
 	sequence++
 	return pr
@@ -96,8 +100,8 @@ func testNetwork(pr *pingResponse, pi pingInfo, conn *icmp.PacketConn) {
 		return
 	}
 
-	logger.WriteString("Response " + strconv.Itoa(sequence) + " received from " + peer.String() +
-		" after " + time.Now().Sub(start).String())
+	// logger.WriteString("Response " + strconv.Itoa(sequence) + " received from " + peer.String() +
+	// 	" after " + time.Now().Sub(start).String())
 }
 
 // This checks if we can convert an URL to an IP
@@ -144,8 +148,8 @@ func testDNS(pr *pingResponse, pi pingInfo, conn *icmp.PacketConn) {
 		return
 	}
 
-	logger.WriteString("Response " + strconv.Itoa(sequence) + " received from " + peer.String() +
-		" after " + time.Now().Sub(start).String())
+	// logger.WriteString("Response " + strconv.Itoa(sequence) + " received from " + peer.String() +
+	// 	" after " + time.Now().Sub(start).String())
 }
 
 // This checks if we can ping an external IP
@@ -190,8 +194,8 @@ func testInternet(pr *pingResponse, pi pingInfo, conn *icmp.PacketConn) {
 		return
 	}
 
-	logger.WriteString("Response " + strconv.Itoa(sequence) + " received from " + peer.String() +
-		" after " + time.Now().Sub(start).String())
+	// logger.WriteString("Response " + strconv.Itoa(sequence) + " received from " + peer.String() +
+	// 	" after " + time.Now().Sub(start).String())
 }
 
 func createMessage() icmp.Message {
