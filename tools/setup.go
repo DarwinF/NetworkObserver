@@ -86,14 +86,14 @@ func RunTest(pi pingInfo, runlen int) {
 			if pr.external_ip {
 				tl["extip"]++
 			}
-			if pr.external_url {
-				tl["exturl"]++
-			}
+			// if pr.external_url {
+			// 	tl["exturl"]++
+			// }
 			tl["total"]++
 
 			timeline := "Internal Ping Success Count: " + strconv.Itoa(tl["internal"]) + "/" + strconv.Itoa(tl["total"]) +
-				"\nExternal IP Ping Success Count: " + strconv.Itoa(tl["extip"]) + "/" + strconv.Itoa(tl["total"]) +
-				"\nExternal URL Ping Success Count: " + strconv.Itoa(tl["exturl"]) + "/" + strconv.Itoa(tl["total"])
+				"\nExternal IP Ping Success Count: " + strconv.Itoa(tl["extip"]) + "/" + strconv.Itoa(tl["total"]) //+
+			// "\nExternal URL Ping Success Count: " + strconv.Itoa(tl["exturl"]) + "/" + strconv.Itoa(tl["total"])
 
 			reporter.SetTimeline(timeline)
 		}

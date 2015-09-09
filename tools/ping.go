@@ -50,7 +50,7 @@ func Ping(pi pingInfo) pingResponse {
 
 	testNetwork(&pr, pi, conn)
 	testInternet(&pr, pi, conn)
-	testDNS(&pr, pi, conn)
+	// testDNS(&pr, pi, conn)
 
 	logger.WriteString("Finished test number " + strconv.Itoa(sequence))
 
