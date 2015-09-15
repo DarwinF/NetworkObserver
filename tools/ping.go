@@ -13,7 +13,6 @@ import (
 	"errors"
 	"fmt"
 	"golang.org/x/net/icmp"
-	"golang.org/x/net/internal/iana"
 	"golang.org/x/net/ipv4"
 	"net"
 	"os"
@@ -27,6 +26,8 @@ type pingInfo struct {
 	internalip  string
 	externalurl string
 }
+
+var protocolICMP int = 1
 
 var sequence int = 1
 
@@ -91,7 +92,7 @@ func testNetwork(pr *pingResponse, pi pingInfo, conn *icmp.PacketConn) {
 		return
 	}
 
-	_, err = icmp.ParseMessage(iana.ProtocolICMP, response[:count])
+	_, err = icmp.ParseMessage(protocolICMP, response[:count])
 	if err != nil {
 		emsg := "Could not parse the message received."
 		logger.WriteString(emsg)
@@ -139,7 +140,7 @@ func testDNS(pr *pingResponse, pi pingInfo, conn *icmp.PacketConn) {
 		return
 	}
 
-	_, err = icmp.ParseMessage(iana.ProtocolICMP, response[:count])
+	_, err = icmp.ParseMessage(protocolICMP, response[:count])
 	if err != nil {
 		emsg := "Could not parse the message received."
 		logger.WriteString(emsg)
@@ -185,7 +186,7 @@ func testInternet(pr *pingResponse, pi pingInfo, conn *icmp.PacketConn) {
 		return
 	}
 
-	_, err = icmp.ParseMessage(iana.ProtocolICMP, response[:count])
+	_, err = icmp.ParseMessage(protocolICMP, response[:count])
 	if err != nil {
 		emsg := "Could not parse the message received."
 		logger.WriteString(emsg)
