@@ -1,5 +1,6 @@
 package settings
 
-var AppLocation string = "/var/lib/network_observer"
+//var AppLocation string = "/var/lib/network_observer"
 
-// var AppLocation string = "./"
+// AppLocation - location of application files; should be root
+var AppLocation = "../"
