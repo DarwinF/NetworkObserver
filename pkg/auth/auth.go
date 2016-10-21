@@ -8,7 +8,7 @@
 package auth
 
 import (
-	"NetworkObserver/settings"
+	"NetworkObserver/pkg/settings"
 	"bufio"
 	"math/rand"
 	"net/http"

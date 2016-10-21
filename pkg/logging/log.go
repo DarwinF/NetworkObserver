@@ -1,14 +1,14 @@
 package logger
 
 import (
-	"NetworkObserver/settings"
+	"NetworkObserver/pkg/settings"
 	"fmt"
 	"log"
 	"os"
 	"time"
 )
 
-var logloc string = settings.AppLocation + "/Logs"
+var logloc = settings.AppLocation + "/Logs"
 
 func init() {
 	// Check if the log folder exists
@@ -41,6 +41,7 @@ func exists(path string) (bool, error) {
 	return true, err
 }
 
+// WriteString - writes the string to the log file
 func WriteString(s string) {
 	filename := logloc + "/" + time.Now().Format("01-02-2006") + ".log"
 

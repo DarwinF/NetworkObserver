@@ -8,17 +8,17 @@
 package main
 
 import (
-	"NetworkObserver/configuration"
-	"NetworkObserver/logger"
-	"NetworkObserver/settings"
-	"NetworkObserver/web"
+	"NetworkObserver/pkg/configuration"
+	logger "NetworkObserver/pkg/logging"
+	settings "NetworkObserver/pkg/settings"
+	websrv "NetworkObserver/pkg/webserver"
 	"net/http"
 	"os"
 )
 
 // Random default value
-var portNumber string = "5000"
-var loc string = settings.AppLocation
+var portNumber = "5000"
+var loc = settings.AppLocation
 
 func init() {
 	cl := loc + "/.cookies"
@@ -50,22 +50,22 @@ func init() {
 
 func main() {
 	// Base Pages
-	http.HandleFunc("/", web.Root)
-	http.HandleFunc("/checkLogin", web.CheckLogin)
-	http.HandleFunc("/dashboard", web.Dashboard)
-	http.HandleFunc("/createaccount", web.CreateAccount)
-	http.HandleFunc("/account", web.HandleAccount)
+	http.HandleFunc("/", websrv.Root)
+	http.HandleFunc("/checkLogin", websrv.CheckLogin)
+	http.HandleFunc("/dashboard", websrv.Dashboard)
+	http.HandleFunc("/createaccount", websrv.CreateAccount)
+	http.HandleFunc("/account", websrv.HandleAccount)
 
 	// Handlers
-	http.HandleFunc("/saveConfig", web.SaveConfig)
-	http.HandleFunc("/savetest", web.SaveTest)
-	http.HandleFunc("/teststarted", web.TestStarted)
-	http.HandleFunc("/logout", web.Logout)
+	http.HandleFunc("/saveConfig", websrv.SaveConfig)
+	http.HandleFunc("/savetest", websrv.SaveTest)
+	http.HandleFunc("/teststarted", websrv.TestStarted)
+	http.HandleFunc("/logout", websrv.Logout)
 
 	// Dashboard Pages
-	http.HandleFunc("/dashboard/configure", web.Configure)
-	http.HandleFunc("/dashboard/start_test", web.StartTest)
-	http.HandleFunc("/dashboard/reports", web.Reports)
+	http.HandleFunc("/dashboard/configure", websrv.Configure)
+	http.HandleFunc("/dashboard/start_test", websrv.StartTest)
+	http.HandleFunc("/dashboard/reports", websrv.Reports)
 
 	// Start the Webserver
 	http.ListenAndServe(portNumber, nil)

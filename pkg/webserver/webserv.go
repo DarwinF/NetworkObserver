@@ -11,12 +11,12 @@
 package web
 
 import (
-	"NetworkObserver/auth"
-	"NetworkObserver/configuration"
-	"NetworkObserver/logger"
-	"NetworkObserver/reporter"
-	"NetworkObserver/settings"
-	"NetworkObserver/tools"
+	auth "NetworkObserver/pkg/auth"
+	"NetworkObserver/pkg/configuration"
+	logger "NetworkObserver/pkg/logging"
+	reporter "NetworkObserver/pkg/reporting"
+	settings "NetworkObserver/pkg/settings"
+	tools "NetworkObserver/pkg/tools"
 	"crypto/sha256"
 	"html/template"
 	"net/http"
@@ -28,8 +28,8 @@ import (
 //--------------------------------------------
 // Variables
 //--------------------------------------------
-var errMsg string = ""
-var loc string = settings.AppLocation
+var errMsg = ""
+var loc = settings.AppLocation
 
 //--------------------------------------------
 // Structs for Pages
@@ -58,11 +58,12 @@ type createAccount struct {
 	Username string
 }
 
+// ErrorMessage - contains an error message to display to the user
 type ErrorMessage struct {
 	Msg string
 }
 
-// All URLs default to this function
+// Root - All URLs default to this function
 func Root(w http.ResponseWriter, r *http.Request) {
 	valid := auth.CheckSessionID(r)
 
@@ -73,7 +74,7 @@ func Root(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// Handles URLs referencing dashboard
+// Dashboard - Handles URLs referencing dashboard
 func Dashboard(w http.ResponseWriter, r *http.Request) {
 	valid := auth.CheckSessionID(r)
 
@@ -84,7 +85,7 @@ func Dashboard(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// Validates a login attempt or redirects the user to
+// CheckLogin - Validates a login attempt or redirects the user to
 // an error page which redirects them to "Root"
 func CheckLogin(w http.ResponseWriter, r *http.Request) {
 	uname := r.FormValue("username")
@@ -105,13 +106,13 @@ func CheckLogin(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// Create a new account by comparing both of the passwords
+// CreateAccount - Create a new account by comparing both of the passwords
 // entered and then hashing and storing the password
 func CreateAccount(w http.ResponseWriter, r *http.Request) {
 	servePageStatic(w, r, loc+"/html/createaccount.html")
 }
 
-// Serve the webpage for creating an account
+// HandleAccount - Serve the webpage for creating an account
 func HandleAccount(w http.ResponseWriter, r *http.Request) {
 	un := r.FormValue("username")
 	pw := r.FormValue("password")
@@ -139,7 +140,7 @@ func HandleAccount(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// Save the configuration settings and then reload the configuration
+// SaveConfig - Save the configuration settings and then reload the configuration
 // page (which will automatically reload the new settings)
 func SaveConfig(w http.ResponseWriter, r *http.Request) {
 	valid := auth.CheckSessionID(r)
@@ -153,7 +154,7 @@ func SaveConfig(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// The test has had it's "test specific settings "
+// SaveTest - The test has had it's "test specific settings "
 func SaveTest(w http.ResponseWriter, r *http.Request) {
 	valid := auth.CheckSessionID(r)
 
@@ -192,7 +193,7 @@ func SaveTest(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// A redirection page to notify the user that the test has been started
+// TestStarted - A redirection page to notify the user that the test has been started
 func TestStarted(w http.ResponseWriter, r *http.Request) {
 	valid := auth.CheckSessionID(r)
 
@@ -203,6 +204,7 @@ func TestStarted(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// Logout - Logs the user out of the system
 func Logout(w http.ResponseWriter, r *http.Request) {
 	auth.RemoveCookie(w, r)
 
@@ -217,6 +219,8 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 // Note: Currently static pages, will be dynamic
 // later.
 //--------------------------------------------
+
+// Settings - Servers the settings web page
 func Settings(w http.ResponseWriter, r *http.Request) {
 	valid := auth.CheckSessionID(r)
 
@@ -227,6 +231,7 @@ func Settings(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// Configure - serves the configuration page
 func Configure(w http.ResponseWriter, r *http.Request) {
 	valid := auth.CheckSessionID(r)
 
@@ -241,6 +246,7 @@ func Configure(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// StartTest - serves the start test web page
 func StartTest(w http.ResponseWriter, r *http.Request) {
 	valid := auth.CheckSessionID(r)
 
@@ -262,6 +268,7 @@ func StartTest(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// Reports - serves the reports web page
 func Reports(w http.ResponseWriter, r *http.Request) {
 	valid := auth.CheckSessionID(r)
 

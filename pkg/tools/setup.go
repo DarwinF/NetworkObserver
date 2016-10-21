@@ -1,9 +1,9 @@
 package tools
 
 import (
-	"NetworkObserver/configuration"
-	"NetworkObserver/logger"
-	"NetworkObserver/reporter"
+	"NetworkObserver/pkg/configuration"
+	logger "NetworkObserver/pkg/logging"
+	"NetworkObserver/pkg/reporting"
 	"errors"
 	"strconv"
 	"time"

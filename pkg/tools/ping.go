@@ -8,16 +8,17 @@
 package tools
 
 import (
-	"NetworkObserver/configuration"
-	"NetworkObserver/logger"
+	"NetworkObserver/pkg/configuration"
+	logger "NetworkObserver/pkg/logging"
 	"errors"
 	"fmt"
-	"golang.org/x/net/icmp"
-	"golang.org/x/net/ipv4"
 	"net"
 	"os"
 	"strconv"
 	"time"
+
+	"golang.org/x/net/icmp"
+	"golang.org/x/net/ipv4"
 )
 
 type pingInfo struct {

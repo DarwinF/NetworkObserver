@@ -1,10 +1,13 @@
 package configuration
 
 import (
-	"NetworkObserver/logger"
-	"NetworkObserver/settings"
+	logger "NetworkObserver/pkg/logging"
+	"NetworkObserver/pkg/settings"
 	"bufio"
+	"errors"
+	"math/rand"
 	"os"
+	"reflect"
 	"strings"
 )
 
@@ -216,4 +219,145 @@ func storeValue(line string, sect Section) {
 			sysConfig.SpeedTestDelay = str[1]
 		}
 	}
+}
+
+func SetInternalIP(ip map[string]string) {
+	equal := reflect.DeepEqual(ip, sysConfig.InternalIPs)
+
+	if !equal {
+		updated = true
+		sysConfig.InternalIPs = ip
+	}
+}
+
+func SetReportLocations(loc string) {
+	if loc != sysConfig.ReportLocations {
+		updated = true
+		sysConfig.ReportLocations = loc
+	}
+}
+
+func SetDeviceIP(ip string) {
+	if ip != sysConfig.DeviceIP {
+		updated = true
+		sysConfig.DeviceIP = ip
+	}
+}
+
+func SetPortNumber(pn string) {
+	if pn != sysConfig.PortNumber {
+		updated = true
+		sysConfig.PortNumber = pn
+	}
+}
+
+func SetExternalIPs(ips []string) {
+	equal := reflect.DeepEqual(ips, sysConfig.ExternalIP)
+
+	if !equal {
+		updated = true
+		sysConfig.ExternalIP = ips
+	}
+}
+
+func SetExternalURLs(urls []string) {
+	equal := reflect.DeepEqual(urls, sysConfig.ExternalURL)
+
+	if !equal {
+		updated = true
+		sysConfig.ExternalURL = urls
+	}
+}
+
+func SetSpeedTestFileLocation(loc string) {
+	if loc != sysConfig.SpeedTestFileLocation {
+		updated = true
+		sysConfig.SpeedTestFileLocation = loc
+	}
+}
+
+func SetPingDelay(delay string) {
+	if delay != sysConfig.PingDelay {
+		updated = true
+		sysConfig.PingDelay = delay
+	}
+}
+
+func SetSpeedTestDelay(delay string) {
+	if delay != sysConfig.SpeedTestDelay {
+		updated = true
+		sysConfig.SpeedTestDelay = delay
+	}
+}
+
+func GetDeviceIP() string {
+	return sysConfig.DeviceIP
+}
+
+func GetPortNumber() string {
+	return sysConfig.PortNumber
+}
+
+func GetInternalIPs() string {
+	ipString := ""
+
+	for k, v := range sysConfig.InternalIPs {
+		ipString += k + "=" + v + "\n"
+	}
+
+	return ipString
+}
+
+func GetInternalIPbyKey(key string) (string, error) {
+	for k, v := range sysConfig.InternalIPs {
+		if strings.Contains(k, key) {
+			return v, nil
+		}
+	}
+
+	return "", errors.New("No ip associated with the key could be found.")
+}
+
+func GetExternalIPs() string {
+	ipString := ""
+
+	for _, v := range sysConfig.ExternalIP {
+		ipString += v + "\n"
+	}
+
+	return ipString
+}
+
+func GetRandomExternalIP() string {
+	return sysConfig.ExternalIP[rand.Intn(len(sysConfig.ExternalIP))]
+}
+
+func GetExternalURLs() string {
+	urlString := ""
+
+	for _, v := range sysConfig.ExternalURL {
+		urlString += v + "\n"
+	}
+
+	return urlString
+}
+
+func GetRandomExternalURL() string {
+	return sysConfig.ExternalURL[rand.Intn(len(sysConfig.ExternalURL))]
+}
+
+func GetSpeedFileLocation() string {
+	return sysConfig.SpeedTestFileLocation
+}
+
+func GetReportsLocation() string {
+	return sysConfig.ReportLocations
+}
+
+func GetPingDelay() string {
+	return sysConfig.PingDelay
+}
+
+func GetSpeedDelay() string {
+	return sysConfig.SpeedTestDelay
 }
