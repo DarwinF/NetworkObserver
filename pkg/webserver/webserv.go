@@ -299,6 +299,8 @@ func servePageDynamic(w http.ResponseWriter, r *http.Request, pageName string, d
 
 // Saves the settings to the config file
 func saveConfigToStruct(r *http.Request) {
+	// Turn this into JSON
+
 	configuration.SetDeviceIP(r.FormValue("deviceip"))
 	configuration.SetInternalIP(ipToMap(r.FormValue("internalip")))
 	configuration.SetReportLocations(r.FormValue("reportfileloc"))

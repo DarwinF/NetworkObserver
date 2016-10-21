@@ -1,12 +1,12 @@
 package configuration
 
 import (
-	logger "NetworkObserver/pkg/logging"
 	"NetworkObserver/pkg/settings"
 	"bufio"
 	"encoding/json"
 	"errors"
-	"ioutil"
+	"fmt"
+	"io/ioutil"
 	"math/rand"
 	"os"
 	"reflect"
@@ -72,32 +72,18 @@ var configPath = loc + "/config.json"
 var sysConfig SystemSettings
 
 var updated = false
+var config Configuration
 
-// read the .ini file and fill the system struct
-// with the data
+// read the .json file into the correct structs
 func init() {
 	cf := configPath
-
-	// TODO: If the config file doesn't exist, generate a sample one
-
-	file, err := os.Open(cf)
-
-	if err != nil {
-		logger.WriteString("The config file " + cf +
-			" could not be found. A config file can be created by editing the configuration page.")
-		return
-	}
-
-	defer file.Close()
-
 	file, err := ioutil.ReadFile("./config.json")
 
-	var config Configuration
 	// Todo: Grab the error from this
 	json.Unmarshal(file, &config)
 }
 
-// Write the configuration settings to the configuration file
+// WriteToFile - Writes the configuration to file
 func WriteToFile() {
 	if !updated {
 		return
@@ -109,100 +95,15 @@ func WriteToFile() {
 	w := bufio.NewWriter(file)
 	defer w.Flush()
 
-	w.WriteString("[General]\n")
-	w.WriteString("deviceip=" + sysConfig.DeviceIP + "\n")
-	w.WriteString("port=" + sysConfig.PortNumber + "\n")
+	data, err := json.Marshal(config)
+	if err != nil {
+		fmt.Println("error: ", err)
+	}
 
-	w.WriteString("[Internal Addresses]\n")
-	writeMap(sysConfig.InternalIPs, w)
-
-	w.WriteString("[External Addresses]\n")
-	writeSlice(sysConfig.ExternalIP, "ip", w)
-	writeSlice(sysConfig.ExternalURL, "url", w)
-
-	w.WriteString("[File Locations]\n")
-	w.WriteString("speedtest=" + sysConfig.SpeedTestFileLocation + "\n")
-	w.WriteString("reports=" + sysConfig.ReportLocations + "\n")
-
-	w.WriteString("[Test Delays]\n")
-	w.WriteString("ping=" + sysConfig.PingDelay + "\n")
-	w.WriteString("speedtest=" + sysConfig.SpeedTestDelay + "\n")
+	w.Write(data)
 
 	// everything is written and nothing is new anymore
 	updated = false
-}
-
-func writeMap(m map[string]string, w *bufio.Writer) {
-	for k, v := range m {
-		w.WriteString(k + "=" + v + "\n")
-	}
-}
-
-func writeSlice(s []string, id string, w *bufio.Writer) {
-	for _, v := range s {
-		w.WriteString(id + "=" + v + "\n")
-	}
-}
-
-func identify(line string, currSect Section) Section {
-	if line[0] == '[' {
-		str := strings.Replace(line, "[", "", -1)
-		str = strings.Replace(str, "]", "", -1)
-
-		switch str {
-		case "Internal Addresses":
-			return InternalAddr
-		case "External Addresses":
-			return ExternalAddr
-		case "General":
-			return General
-		case "File Locations":
-			return FileLocs
-		case "Test Delays":
-			return TestDelays
-		}
-	}
-
-	return currSect
-}
-
-func storeValue(line string, sect Section) {
-	str := make([]string, 0)
-	// Seprate the line into the two parts: identifier and value
-	// if the line is a header line, ignore it
-	if line[0] != '[' && line[0] != ';' {
-		str = strings.Split(line, "=")
-	} else {
-		return
-	}
-	// store the value in the correct struct element
-	if sect == InternalAddr {
-		sysConfig.InternalIPs[strings.ToLower(str[0])] = str[1]
-	} else if sect == ExternalAddr {
-		if str[0] == "ip" {
-			sysConfig.ExternalIP = append(sysConfig.ExternalIP, str[1])
-		} else if str[0] == "url" {
-			sysConfig.ExternalURL = append(sysConfig.ExternalURL, str[1])
-		}
-	} else if sect == General {
-		if str[0] == "port" {
-			sysConfig.PortNumber = str[1]
-		} else if str[0] == "deviceip" {
-			sysConfig.DeviceIP = str[1]
-		}
-	} else if sect == FileLocs {
-		if str[0] == "speedtest" {
-			sysConfig.SpeedTestFileLocation = str[1]
-		} else if str[0] == "reports" {
-			sysConfig.ReportLocations = str[1]
-		}
-	} else if sect == TestDelays {
-		if str[0] == "ping" {
-			sysConfig.PingDelay = str[1]
-		} else if str[0] == "speedtest" {
-			sysConfig.SpeedTestDelay = str[1]
-		}
-	}
 }
 
 func SetInternalIP(ip map[string]string) {

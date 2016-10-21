@@ -1,5 +1,6 @@
 # ignore the .DS_Store folder created on Mac OS X
 .DS_Store
+.vscode
 # ignore the NetworkObserver binary created
 NetworkObserver
 NetworkObserver-arm
