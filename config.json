@@ -1,0 +1,45 @@
+{
+  "SystemSettings": {
+    "DeviceIp": "192.168.1.110",
+    "Port": 5000
+  },
+  "TestSettings": {
+    "Configuration": {
+      "PingDelay": 4,
+      "SpeedTestDelay": 120
+    },
+    "InternalAddresses": [{
+      "Id": "ip_one",
+      "Address": "1.23.456.789"
+    }, {
+      "Id": "ip_two",
+      "Address": "1.23.456.789"
+    }, {
+      "Id": "ip_three",
+      "Address": "1.23.456.789"
+    }, {
+      "Id": "ip_four",
+      "Address": "1.23.456.789"
+    }],
+    "ExternalAddresses": {
+      "IpAddresses": [{
+        "Id": "ip_one",
+        "Address": "123.123.123.123"
+      }, {
+        "Id": "ip_two",
+        "Address": "456.456.456.456"
+      }],
+      "UrlAddresses": [{
+        "Id": "sample",
+        "Url": "example.test"
+      }]    
+    },
+    "FileLocations": [{
+      "Id": "speedtest",
+      "Path": "path/to/file"
+    }, {
+      "Id": "reports",
+      "Path": "path/to/file"
+    }]
+  }
+}
