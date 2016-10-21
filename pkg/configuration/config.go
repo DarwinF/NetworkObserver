@@ -4,7 +4,9 @@ import (
 	logger "NetworkObserver/pkg/logging"
 	"NetworkObserver/pkg/settings"
 	"bufio"
+	"encoding/json"
 	"errors"
+	"ioutil"
 	"math/rand"
 	"os"
 	"reflect"
@@ -15,77 +17,68 @@ import (
 // Structs
 //--------------------------------
 
-// this struct contains settings
-// that are configured for a specific
-// test run
-type TestSettings struct {
-	InternalIP string
-	RunLength  string
-
-	configSettings
-}
-
-// these are settings that are global
-// but can also be overwritten for one
-// specific test run
-type configSettings struct {
-	ExternalIP            []string
-	ExternalURL           []string
-	SpeedTestFileLocation string
-	PingDelay             string
-	SpeedTestDelay        string
-}
-
-// these are the settings that are globally
-// set for the program
+// SystemSettings - General system settings
 type SystemSettings struct {
-	InternalIPs     map[string]string
-	ReportLocations string
-	DeviceIP        string
-	PortNumber      string
+	DeviceIP string
+	Port     int
+}
 
-	configSettings
+// DelaySettings - General test configuration settings
+type DelaySettings struct {
+	PingDelay      int
+	SpeedTestDelay int
+}
+
+type taggedIP struct {
+	ID      string
+	Address string
+}
+
+type taggedURL struct {
+	ID  string
+	URL string
+}
+
+type taggedPath struct {
+	ID   string
+	Path string
+}
+
+// ExternalAddresses - External ip addresses and url addresses
+type ExternalAddresses struct {
+	IPAddresses  []taggedIP
+	URLAddresses []taggedURL
+}
+
+// TestSettings - Settings for testing
+type TestSettings struct {
+	Configuration     DelaySettings
+	InternalAddresses []taggedIP
+	ExternalAddresses ExternalAddresses
+	FileLocations     []taggedPath
+}
+
+// Configuration - all the configuration settings
+type Configuration struct {
+	SystemSettings SystemSettings
+	TestSettings   TestSettings
 }
 
 //--------------------------------
 // Variables
 //--------------------------------
-var loc string = settings.AppLocation
-var samplePath string = loc + "/config.txt.example"
-var configPath string = loc + "/config.txt"
+var loc = settings.AppLocation
+var configPath = loc + "/config.json"
 var sysConfig SystemSettings
 
 var updated = false
-
-//--------------------------------
-// Enum
-//--------------------------------
-type Section int8
-
-const (
-	Pretext      Section = -1
-	General      Section = 1
-	InternalAddr Section = 2
-	ExternalAddr Section = 3
-	FileLocs     Section = 4
-	TestDelays   Section = 5
-)
 
 // read the .ini file and fill the system struct
 // with the data
 func init() {
 	cf := configPath
 
-	// Setup struct
-	sysConfig = SystemSettings{}
-	sysConfig.InternalIPs = make(map[string]string)
-	sysConfig.ExternalIP = make([]string, 0)
-	sysConfig.ExternalURL = make([]string, 0)
-
-	if _, err := os.Stat(cf); os.IsNotExist(err) {
-		logger.WriteString("The config file " + cf + " does not exist. Attempting to locate config.txt.example")
-		cf = samplePath
-	}
+	// TODO: If the config file doesn't exist, generate a sample one
 
 	file, err := os.Open(cf)
 
@@ -97,20 +90,11 @@ func init() {
 
 	defer file.Close()
 
-	// Set the initial value for sect, this way we have a base
-	// value
-	sect := Pretext
+	file, err := ioutil.ReadFile("./config.json")
 
-	// read the line from the file
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		str := scanner.Text()
-		// identify what section we are in
-		if str != "" {
-			sect = identify(str, sect)
-			storeValue(str, sect)
-		}
-	}
+	var config Configuration
+	// Todo: Grab the error from this
+	json.Unmarshal(file, &config)
 }
 
 // Write the configuration settings to the configuration file
