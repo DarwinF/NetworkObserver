@@ -161,6 +161,7 @@ func SetSpeedTestFileLocation(loc string) {
 	}
 }
 
+// SetPingDelay - Sets the ping delay
 func SetPingDelay(delay string) {
 	if delay != sysConfig.PingDelay {
 		updated = true
@@ -168,6 +169,7 @@ func SetPingDelay(delay string) {
 	}
 }
 
+// SetSpeedTestDelay - Sets the speed tests delay
 func SetSpeedTestDelay(delay string) {
 	if delay != sysConfig.SpeedTestDelay {
 		updated = true
@@ -175,14 +177,17 @@ func SetSpeedTestDelay(delay string) {
 	}
 }
 
+// GetDeviceIP - Returns the devices ip address
 func GetDeviceIP() string {
 	return sysConfig.DeviceIP
 }
 
+// GetPortNumber - Returns the port number
 func GetPortNumber() string {
 	return sysConfig.PortNumber
 }
 
+// GetInternalIPs returns all the internal ip addresses
 func GetInternalIPs() string {
 	ipString := ""
 
@@ -193,6 +198,7 @@ func GetInternalIPs() string {
 	return ipString
 }
 
+// GetInternalIPbyKey - Returns an internal ip address by searching based on the key passed in
 func GetInternalIPbyKey(key string) (string, error) {
 	for k, v := range sysConfig.InternalIPs {
 		if strings.Contains(k, key) {
@@ -203,6 +209,7 @@ func GetInternalIPbyKey(key string) (string, error) {
 	return "", errors.New("No ip associated with the key could be found.")
 }
 
+// GetExternalIPs - Returns all the external ip addresses
 func GetExternalIPs() string {
 	ipString := ""
 
@@ -213,10 +220,12 @@ func GetExternalIPs() string {
 	return ipString
 }
 
+// GetRandomExternalIP - Returns a random external IP address
 func GetRandomExternalIP() string {
 	return sysConfig.ExternalIP[rand.Intn(len(sysConfig.ExternalIP))]
 }
 
+// GetExternalURLs - Returns all external urls
 func GetExternalURLs() string {
 	urlString := ""
 
@@ -227,22 +236,27 @@ func GetExternalURLs() string {
 	return urlString
 }
 
+// GetRandomExternalURL - Returns a random external url
 func GetRandomExternalURL() string {
 	return sysConfig.ExternalURL[rand.Intn(len(sysConfig.ExternalURL))]
 }
 
+// GetSpeedFileLocation - Returns the location of the speed test files
 func GetSpeedFileLocation() string {
 	return sysConfig.SpeedTestFileLocation
 }
 
+// GetReportsLocation - Returns the location of the report files
 func GetReportsLocation() string {
 	return sysConfig.ReportLocations
 }
 
+// GetPingDelay - Returns the ping delay
 func GetPingDelay() string {
 	return sysConfig.PingDelay
 }
 
+// GetSpeedDelay - Returns the speed delay
 func GetSpeedDelay() string {
 	return sysConfig.SpeedTestDelay
 }
