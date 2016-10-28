@@ -3,6 +3,10 @@
 Observes a network connection testing connectivity and network speed.
 
 ## Changelog
+### Current
+* Will not function properly - lots of changes being actively developed
+* 'First Beta' release is available and should still be used
+
 ### Version 0.0.14
 * Basic report logging is in place
 
