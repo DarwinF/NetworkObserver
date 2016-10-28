@@ -1,16 +1,14 @@
 package configuration
 
 import (
-	logger "NetworkObserver/pkg/logging"
 	"NetworkObserver/pkg/settings"
 	"bufio"
 	"encoding/json"
 	"errors"
-	"ioutil"
-	"math/rand"
+	"fmt"
+	"io/ioutil"
 	"os"
 	"reflect"
-	"strings"
 )
 
 //--------------------------------
@@ -20,13 +18,13 @@ import (
 // SystemSettings - General system settings
 type SystemSettings struct {
 	DeviceIP string
-	Port     int
+	Port     string
 }
 
 // DelaySettings - General test configuration settings
 type DelaySettings struct {
-	PingDelay      int
-	SpeedTestDelay int
+	PingDelay      string
+	SpeedTestDelay string
 }
 
 type taggedIP struct {
@@ -69,35 +67,20 @@ type Configuration struct {
 //--------------------------------
 var loc = settings.AppLocation
 var configPath = loc + "/config.json"
-var sysConfig SystemSettings
 
 var updated = false
+var config Configuration
 
-// read the .ini file and fill the system struct
-// with the data
+// read the .json file into the correct structs
 func init() {
-	cf := configPath
+	// Todo: use the error from here
+	file, _ := ioutil.ReadFile("./config.json")
 
-	// TODO: If the config file doesn't exist, generate a sample one
-
-	file, err := os.Open(cf)
-
-	if err != nil {
-		logger.WriteString("The config file " + cf +
-			" could not be found. A config file can be created by editing the configuration page.")
-		return
-	}
-
-	defer file.Close()
-
-	file, err := ioutil.ReadFile("./config.json")
-
-	var config Configuration
 	// Todo: Grab the error from this
 	json.Unmarshal(file, &config)
 }
 
-// Write the configuration settings to the configuration file
+// WriteToFile - Writes the configuration to file
 func WriteToFile() {
 	if !updated {
 		return
@@ -109,239 +92,186 @@ func WriteToFile() {
 	w := bufio.NewWriter(file)
 	defer w.Flush()
 
-	w.WriteString("[General]\n")
-	w.WriteString("deviceip=" + sysConfig.DeviceIP + "\n")
-	w.WriteString("port=" + sysConfig.PortNumber + "\n")
+	data, err := json.Marshal(config)
+	if err != nil {
+		fmt.Println("error: ", err)
+	}
 
-	w.WriteString("[Internal Addresses]\n")
-	writeMap(sysConfig.InternalIPs, w)
-
-	w.WriteString("[External Addresses]\n")
-	writeSlice(sysConfig.ExternalIP, "ip", w)
-	writeSlice(sysConfig.ExternalURL, "url", w)
-
-	w.WriteString("[File Locations]\n")
-	w.WriteString("speedtest=" + sysConfig.SpeedTestFileLocation + "\n")
-	w.WriteString("reports=" + sysConfig.ReportLocations + "\n")
-
-	w.WriteString("[Test Delays]\n")
-	w.WriteString("ping=" + sysConfig.PingDelay + "\n")
-	w.WriteString("speedtest=" + sysConfig.SpeedTestDelay + "\n")
+	w.Write(data)
 
 	// everything is written and nothing is new anymore
 	updated = false
 }
 
-func writeMap(m map[string]string, w *bufio.Writer) {
-	for k, v := range m {
-		w.WriteString(k + "=" + v + "\n")
-	}
-}
-
-func writeSlice(s []string, id string, w *bufio.Writer) {
-	for _, v := range s {
-		w.WriteString(id + "=" + v + "\n")
-	}
-}
-
-func identify(line string, currSect Section) Section {
-	if line[0] == '[' {
-		str := strings.Replace(line, "[", "", -1)
-		str = strings.Replace(str, "]", "", -1)
-
-		switch str {
-		case "Internal Addresses":
-			return InternalAddr
-		case "External Addresses":
-			return ExternalAddr
-		case "General":
-			return General
-		case "File Locations":
-			return FileLocs
-		case "Test Delays":
-			return TestDelays
-		}
-	}
-
-	return currSect
-}
-
-func storeValue(line string, sect Section) {
-	str := make([]string, 0)
-	// Seprate the line into the two parts: identifier and value
-	// if the line is a header line, ignore it
-	if line[0] != '[' && line[0] != ';' {
-		str = strings.Split(line, "=")
-	} else {
-		return
-	}
-	// store the value in the correct struct element
-	if sect == InternalAddr {
-		sysConfig.InternalIPs[strings.ToLower(str[0])] = str[1]
-	} else if sect == ExternalAddr {
-		if str[0] == "ip" {
-			sysConfig.ExternalIP = append(sysConfig.ExternalIP, str[1])
-		} else if str[0] == "url" {
-			sysConfig.ExternalURL = append(sysConfig.ExternalURL, str[1])
-		}
-	} else if sect == General {
-		if str[0] == "port" {
-			sysConfig.PortNumber = str[1]
-		} else if str[0] == "deviceip" {
-			sysConfig.DeviceIP = str[1]
-		}
-	} else if sect == FileLocs {
-		if str[0] == "speedtest" {
-			sysConfig.SpeedTestFileLocation = str[1]
-		} else if str[0] == "reports" {
-			sysConfig.ReportLocations = str[1]
-		}
-	} else if sect == TestDelays {
-		if str[0] == "ping" {
-			sysConfig.PingDelay = str[1]
-		} else if str[0] == "speedtest" {
-			sysConfig.SpeedTestDelay = str[1]
-		}
-	}
-}
-
+// SetInternalIP - Sets the internal ip value
 func SetInternalIP(ip map[string]string) {
-	equal := reflect.DeepEqual(ip, sysConfig.InternalIPs)
+	equal := reflect.DeepEqual(ip, config.TestSettings.InternalAddresses)
 
 	if !equal {
 		updated = true
-		sysConfig.InternalIPs = ip
-	}
-}
-
-func SetReportLocations(loc string) {
-	if loc != sysConfig.ReportLocations {
-		updated = true
-		sysConfig.ReportLocations = loc
-	}
-}
-
-func SetDeviceIP(ip string) {
-	if ip != sysConfig.DeviceIP {
-		updated = true
-		sysConfig.DeviceIP = ip
-	}
-}
-
-func SetPortNumber(pn string) {
-	if pn != sysConfig.PortNumber {
-		updated = true
-		sysConfig.PortNumber = pn
-	}
-}
-
-func SetExternalIPs(ips []string) {
-	equal := reflect.DeepEqual(ips, sysConfig.ExternalIP)
-
-	if !equal {
-		updated = true
-		sysConfig.ExternalIP = ips
-	}
-}
-
-func SetExternalURLs(urls []string) {
-	equal := reflect.DeepEqual(urls, sysConfig.ExternalURL)
-
-	if !equal {
-		updated = true
-		sysConfig.ExternalURL = urls
-	}
-}
-
-func SetSpeedTestFileLocation(loc string) {
-	if loc != sysConfig.SpeedTestFileLocation {
-		updated = true
-		sysConfig.SpeedTestFileLocation = loc
-	}
-}
-
-func SetPingDelay(delay string) {
-	if delay != sysConfig.PingDelay {
-		updated = true
-		sysConfig.PingDelay = delay
-	}
-}
-
-func SetSpeedTestDelay(delay string) {
-	if delay != sysConfig.SpeedTestDelay {
-		updated = true
-		sysConfig.SpeedTestDelay = delay
-	}
-}
-
-func GetDeviceIP() string {
-	return sysConfig.DeviceIP
-}
-
-func GetPortNumber() string {
-	return sysConfig.PortNumber
-}
-
-func GetInternalIPs() string {
-	ipString := ""
-
-	for k, v := range sysConfig.InternalIPs {
-		ipString += k + "=" + v + "\n"
-	}
-
-	return ipString
-}
-
-func GetInternalIPbyKey(key string) (string, error) {
-	for k, v := range sysConfig.InternalIPs {
-		if strings.Contains(k, key) {
-			return v, nil
+		var ips []taggedIP
+		//Todo: Write a mapping function for this
+		for k, v := range ip {
+			ips = append(ips, taggedIP{ID: k, Address: v})
 		}
+
+		config.TestSettings.InternalAddresses = ips
 	}
+}
+
+// SetReportLocation - Sets the report location
+func SetReportLocation(loc string) {
+
+	// Todo: fix this -- and check for null list
+	if loc != config.TestSettings.FileLocations[0].Path {
+		updated = true
+		config.TestSettings.FileLocations[0].Path = loc
+	}
+}
+
+// SetDeviceIP - Sets the device IP
+func SetDeviceIP(ip string) {
+	if ip != config.SystemSettings.DeviceIP {
+		updated = true
+		config.SystemSettings.DeviceIP = ip
+	}
+}
+
+// SetPortNumber - Sets the applications port number
+func SetPortNumber(pn string) {
+	// Todo: Cast to int
+	if pn != config.SystemSettings.Port {
+		updated = true
+		config.SystemSettings.Port = pn
+	}
+}
+
+// SetExternalIPs - Sets the external IP addresses
+func SetExternalIPs(ips []string) {
+	// Todo: This ended up getting mapped weird
+}
+
+// SetExternalURLs - sets the external URLS
+func SetExternalURLs(urls []string) {
+	// Todo: This also ended up getting mapped weird
+}
+
+// SetSpeedTestFileLocation - Sets the speed test file location
+func SetSpeedTestFileLocation(loc string) {
+	// Todo: fix this -- and check for null list
+	if loc != config.TestSettings.FileLocations[1].Path {
+		updated = true
+		config.TestSettings.FileLocations[1].Path = loc
+	}
+}
+
+// SetPingDelay - Sets the ping delay
+func SetPingDelay(delay string) {
+	// Todo: Cast to int
+	if delay != config.TestSettings.Configuration.PingDelay {
+		updated = true
+		config.TestSettings.Configuration.PingDelay = delay
+	}
+}
+
+// SetSpeedTestDelay - Sets the speed tests delay
+func SetSpeedTestDelay(delay string) {
+	if delay != config.TestSettings.Configuration.SpeedTestDelay {
+		updated = true
+		config.TestSettings.Configuration.SpeedTestDelay = delay
+	}
+}
+
+// GetDeviceIP - Returns the devices ip address
+func GetDeviceIP() string {
+	return config.SystemSettings.DeviceIP
+}
+
+// GetPortNumber - Returns the port number
+func GetPortNumber() string {
+	return config.SystemSettings.Port
+}
+
+// GetInternalIPs - returns all the internal ip addresses
+func GetInternalIPs() string {
+	// Todo: Return this properly
+	return ""
+	// ipString := ""
+
+	// for k, v := range config.TestSettings.InternalAddresses {
+	// 	ipString += k + "=" + v + "\n"
+	// }
+
+	// return ipString
+}
+
+// GetInternalIPbyKey - Returns an internal ip address by searching based on the key passed in
+func GetInternalIPbyKey(key string) (string, error) {
+	// Todo: return this properly
+	// for k, v := range sysConfig.InternalIPs {
+	// 	if strings.Contains(k, key) {
+	// 		return v, nil
+	// 	}
+	// }
 
 	return "", errors.New("No ip associated with the key could be found.")
 }
 
+// GetExternalIPs - Returns all the external ip addresses
 func GetExternalIPs() string {
-	ipString := ""
+	// Todo: return this properly
+	// ipString := ""
 
-	for _, v := range sysConfig.ExternalIP {
-		ipString += v + "\n"
-	}
+	// for _, v := range sysConfig.ExternalIP {
+	// 	ipString += v + "\n"
+	// }
 
-	return ipString
+	// return ipString
+	return ""
 }
 
+// GetRandomExternalIP - Returns a random external IP address
 func GetRandomExternalIP() string {
-	return sysConfig.ExternalIP[rand.Intn(len(sysConfig.ExternalIP))]
+	// Todo: return this properly
+	return ""
+	// return sysConfig.ExternalIP[rand.Intn(len(sysConfig.ExternalIP))]
 }
 
+// GetExternalURLs - Returns all external urls
 func GetExternalURLs() string {
 	urlString := ""
 
-	for _, v := range sysConfig.ExternalURL {
-		urlString += v + "\n"
-	}
+	// Todo: return this properly
+	// for _, v := range sysConfig.ExternalURL {
+	// 	urlString += v + "\n"
+	// }
 
 	return urlString
 }
 
+// GetRandomExternalURL - Returns a random external url
 func GetRandomExternalURL() string {
-	return sysConfig.ExternalURL[rand.Intn(len(sysConfig.ExternalURL))]
+	// Todo: return this properly
+	return ""
+	//return sysConfig.ExternalURL[rand.Intn(len(sysConfig.ExternalURL))]
 }
 
+// GetSpeedFileLocation - Returns the location of the speed test files
 func GetSpeedFileLocation() string {
-	return sysConfig.SpeedTestFileLocation
+	return config.TestSettings.FileLocations[1].Path
 }
 
+// GetReportsLocation - Returns the location of the report files
 func GetReportsLocation() string {
-	return sysConfig.ReportLocations
+	return config.TestSettings.FileLocations[0].Path
 }
 
+// GetPingDelay - Returns the ping delay
 func GetPingDelay() string {
-	return sysConfig.PingDelay
+	return config.TestSettings.Configuration.PingDelay
 }
 
+// GetSpeedDelay - Returns the speed delay
 func GetSpeedDelay() string {
-	return sysConfig.SpeedTestDelay
+	return config.TestSettings.Configuration.SpeedTestDelay
 }
