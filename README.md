@@ -1,5 +1,7 @@
 # Network Observer
 
+[![Build Status](https://travis-ci.org/darwinfroese/NetworkObserver.svg?branch=master)](https://travis-ci.org/darwinfroese/NetworkObserver)
+
 Observes a network connection testing connectivity and network speed.
 
 ## Changelog
