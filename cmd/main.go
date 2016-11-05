@@ -8,12 +8,14 @@
 package main
 
 import (
-	"NetworkObserver/pkg/configuration"
-	logger "NetworkObserver/pkg/logging"
-	settings "NetworkObserver/pkg/settings"
-	websrv "NetworkObserver/pkg/webserver"
 	"net/http"
 	"os"
+
+	logger "github.com/darwinfroese/networkobserver/pkg/logging"
+	settings "github.com/darwinfroese/networkobserver/pkg/settings"
+	websrv "github.com/darwinfroese/networkobserver/pkg/webserver"
+
+	"github.com/darwinfroese/networkobserver/pkg/configuration"
 )
 
 // Random default value

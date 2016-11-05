@@ -1,12 +1,13 @@
 package tools
 
 import (
-	"NetworkObserver/pkg/configuration"
-	logger "NetworkObserver/pkg/logging"
-	"NetworkObserver/pkg/reporting"
 	"errors"
 	"strconv"
 	"time"
+
+	"github.com/darwinfroese/networkobserver/pkg/configuration"
+	logger "github.com/darwinfroese/networkobserver/pkg/logging"
+	"github.com/darwinfroese/networkobserver/pkg/reporting"
 )
 
 type TestData struct {

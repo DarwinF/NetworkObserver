@@ -11,18 +11,19 @@
 package web
 
 import (
-	auth "NetworkObserver/pkg/auth"
-	"NetworkObserver/pkg/configuration"
-	logger "NetworkObserver/pkg/logging"
-	reporter "NetworkObserver/pkg/reporting"
-	settings "NetworkObserver/pkg/settings"
-	tools "NetworkObserver/pkg/tools"
 	"crypto/sha256"
 	"html/template"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
+
+	auth "github.com/darwinfroese/networkobserver/pkg/auth"
+	"github.com/darwinfroese/networkobserver/pkg/configuration"
+	logger "github.com/darwinfroese/networkobserver/pkg/logging"
+	reporter "github.com/darwinfroese/networkobserver/pkg/reporting"
+	settings "github.com/darwinfroese/networkobserver/pkg/settings"
+	tools "github.com/darwinfroese/networkobserver/pkg/tools"
 )
 
 //--------------------------------------------

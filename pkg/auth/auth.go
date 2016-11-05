@@ -8,7 +8,6 @@
 package auth
 
 import (
-	"NetworkObserver/pkg/settings"
 	"bufio"
 	"math/rand"
 	"net/http"
@@ -16,6 +15,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/darwinfroese/networkobserver/pkg/settings"
 )
 
 var cookieName string = "NetObAuth"

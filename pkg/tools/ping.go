@@ -8,14 +8,15 @@
 package tools
 
 import (
-	"NetworkObserver/pkg/configuration"
-	logger "NetworkObserver/pkg/logging"
 	"errors"
 	"fmt"
 	"net"
 	"os"
 	"strconv"
 	"time"
+
+	"github.com/darwinfroese/networkobserver/pkg/configuration"
+	logger "github.com/darwinfroese/networkobserver/pkg/logging"
 
 	"golang.org/x/net/icmp"
 	"golang.org/x/net/ipv4"

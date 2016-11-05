@@ -1,9 +1,10 @@
 package reporter
 
 import (
-	"NetworkObserver/pkg/logging"
-	"NetworkObserver/pkg/settings"
 	"os"
+
+	"github.com/darwinfroese/networkobserver/pkg/logging"
+	"github.com/darwinfroese/networkobserver/pkg/settings"
 )
 
 type connection struct {

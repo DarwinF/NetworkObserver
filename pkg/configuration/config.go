@@ -1,7 +1,6 @@
 package configuration
 
 import (
-	"NetworkObserver/pkg/settings"
 	"bufio"
 	"encoding/json"
 	"errors"
@@ -9,6 +8,8 @@ import (
 	"io/ioutil"
 	"os"
 	"reflect"
+
+	"github.com/darwinfroese/networkobserver/pkg/settings"
 )
 
 //--------------------------------
@@ -119,8 +120,8 @@ func SetInternalIP(ip map[string]string) {
 	}
 }
 
-// SetReportLocation - Sets the report location
-func SetReportLocation(loc string) {
+// SetReportLocations - Sets the report location
+func SetReportLocations(loc string) {
 
 	// Todo: fix this -- and check for null list
 	if loc != config.TestSettings.FileLocations[0].Path {

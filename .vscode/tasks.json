@@ -1,0 +1,27 @@
+{
+  // See https://go.microsoft.com/fwlink/?LinkId=733558
+  // for the documentation about the tasks.json format
+  "version": "0.1.0",
+  "command": "cmd",
+  "isShellCommand": true,
+  "args": ["/C"],
+  "showOutput": "always",
+  "tasks": [
+    {
+      "taskName": "build",
+      "args": ["go build -v ${workspaceRoot}/cmd/main.go"],
+      "isBuildCommand": true,
+      "suppressTaskName": true
+    },
+    {
+      "taskName": "clean",
+      "args": ["go clean -i -r -x"],
+      "suppressTaskName": true
+    },
+    {
+      "taskName": "test",
+      "args": ["go test ${workspaceRoot}/..."],
+      "suppressTaskName": true
+    }
+  ]
+}

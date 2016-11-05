@@ -1,11 +1,12 @@
 package logger
 
 import (
-	"NetworkObserver/pkg/settings"
 	"fmt"
 	"log"
 	"os"
 	"time"
+
+	"github.com/darwinfroese/networkobserver/pkg/settings"
 )
 
 var logloc = settings.AppLocation + "/Logs"
