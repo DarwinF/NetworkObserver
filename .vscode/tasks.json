@@ -20,7 +20,7 @@
     },
     {
       "taskName": "test",
-      "args": ["go test ${workspaceRoot}/..."],
+      "args": ["go test -v ./..."],
       "suppressTaskName": true
     }
   ]
