@@ -2,9 +2,19 @@
   // See https://go.microsoft.com/fwlink/?LinkId=733558
   // for the documentation about the tasks.json format
   "version": "0.1.0",
-  "command": "cmd",
+  "windows": {
+    "command": "cmd",
+    "args": ["/C"]
+  },
+  "linux": {
+    "command": "sh",
+    "args": ["-c"]
+  },
+  "osx": {
+    "command": "sh",
+    "args": ["-c"]
+  },
   "isShellCommand": true,
-  "args": ["/C"],
   "showOutput": "always",
   "tasks": [
     {
