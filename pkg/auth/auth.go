@@ -19,11 +19,11 @@ import (
 	"github.com/darwinfroese/networkobserver/pkg/settings"
 )
 
-var cookieName string = "NetObAuth"
+var cookieName = "NetObAuth"
 
-var loc string = settings.AppLocation
-var pwloc string = loc + "/.password"
-var cloc string = loc + "/.cookies"
+var loc = settings.AppLocation
+var pwloc = loc + "/.password"
+var cloc = loc + "/.cookies"
 
 var cookieValues []int
 
