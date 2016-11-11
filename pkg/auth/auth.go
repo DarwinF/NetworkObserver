@@ -1,43 +1,90 @@
-//--------------------------------------------
-// auth/auth.go
+// Package auth provides functionality for authenticating
+// users to the system.
 //
-// Handles the verification of credentials and
-// sessionIDs as well as creation of cookies.
-//--------------------------------------------
-
+// Default Configuration Values
+// * Password Encryption Method: sha256
+// * Salt length in bits: 64
 package auth
 
 import (
-	"bufio"
+	"crypto/sha256"
 	"math/rand"
-	"net/http"
-	"os"
-	"strconv"
-	"strings"
-	"time"
 
-	"github.com/darwinfroese/networkobserver/pkg/settings"
+	"fmt"
 )
 
-var cookieName = "NetObAuth"
-
-var loc = settings.AppLocation
-var pwloc = loc + "/.password"
-var cloc = loc + "/.cookies"
-
-var cookieValues []int
-
-var rgen *rand.Rand
-var max = 999999
-var min = 111111
-
-func init() {
-	src := rand.NewSource(time.Now().UnixNano())
-	rgen = rand.New(src)
-
-	cookieValues = make([]int, 0)
+// Settings is a struct of all the cofiguration options
+// used for configuring the auth package
+type Settings struct {
+	EncryptionMethod string
+	SaltLength       int
+	UseSalt          bool
 }
 
+// Authenticator object for authentication
+type Authenticator interface {
+	Encrypt(string) (string, string, error)
+	Validate(string, string, string) (bool, error)
+}
+
+type authAdapter struct {
+}
+
+var authSettings Settings
+
+func init() {
+	authSettings = Settings{
+		EncryptionMethod: "sha256",
+		SaltLength:       64,
+		UseSalt:          true,
+	}
+}
+
+// NewAuthenticator returns a new authenticator that can be used for authenticating
+func NewAuthenticator(settings *Settings) (Authenticator, error) {
+	a := authAdapter{}
+
+	if settings != nil {
+		authSettings = *settings
+	}
+
+	return &a, nil
+}
+
+func (a *authAdapter) Encrypt(v string) (eValue, salt string, err error) {
+	if authSettings.UseSalt {
+		e, s := sha256WithSalt(v, "")
+		eValue = string(e[:])
+		salt = string(s[:])
+		return
+	}
+
+	e := sha256WithoutSalt(v)
+	eValue = string(e[:])
+
+	return
+}
+
+func (a *authAdapter) Validate(input, salt, password string) (valid bool, err error) {
+	var encryptedString string
+	valid = false
+
+	if authSettings.UseSalt {
+		e, _ := sha256WithSalt(input, salt)
+		encryptedString = string(e[:])
+	} else {
+		e := sha256WithoutSalt(input)
+		encryptedString = string(e[:])
+	}
+
+	if encryptedString == password {
+		valid = true
+	}
+
+	return
+}
+
+/*
 // Read the stored usernames and password hashes from the file
 func CheckCredentials(uname string, pword [32]byte) bool {
 	valid := false
@@ -170,4 +217,34 @@ func used(value int) bool {
 	}
 
 	return false
+}
+*/
+func sha256WithoutSalt(value string) [sha256.Size]byte {
+	encrypted := sha256.Sum256([]byte(value))
+
+	return encrypted
+}
+
+func sha256WithSalt(value, saltValue string) ([sha256.Size]byte, []byte) {
+	salt := make([]byte, authSettings.SaltLength)
+
+	if saltValue != "" {
+		salt = []byte(saltValue)
+	}
+	n, err := rand.Read(salt)
+
+	if err != nil {
+		fmt.Println("There was an error generating a salt: ", err)
+		return [sha256.Size]byte{}, nil
+	}
+
+	if n != authSettings.SaltLength {
+		fmt.Printf("Only %d characters were read.\n", n)
+		return [sha256.Size]byte{}, nil
+	}
+
+	saltedVal := append([]byte(value), salt...)
+	encrypted := sha256.Sum256(saltedVal)
+
+	return encrypted, salt
 }
