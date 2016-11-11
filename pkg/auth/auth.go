@@ -230,17 +230,18 @@ func sha256WithSalt(value, saltValue string) ([sha256.Size]byte, []byte) {
 
 	if saltValue != "" {
 		salt = []byte(saltValue)
-	}
-	n, err := rand.Read(salt)
+	} else {
+		n, err := rand.Read(salt)
 
-	if err != nil {
-		fmt.Println("There was an error generating a salt: ", err)
-		return [sha256.Size]byte{}, nil
-	}
+		if err != nil {
+			fmt.Println("There was an error generating a salt: ", err)
+			return [sha256.Size]byte{}, nil
+		}
 
-	if n != authSettings.SaltLength {
-		fmt.Printf("Only %d characters were read.\n", n)
-		return [sha256.Size]byte{}, nil
+		if n != authSettings.SaltLength {
+			fmt.Printf("Only %d characters were read.\n", n)
+			return [sha256.Size]byte{}, nil
+		}
 	}
 
 	saltedVal := append([]byte(value), salt...)
