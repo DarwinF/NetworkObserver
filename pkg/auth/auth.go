@@ -1,173 +1,116 @@
-//--------------------------------------------
-// auth/auth.go
+// Package auth provides functionality for authenticating
+// users to the system.
 //
-// Handles the verification of credentials and
-// sessionIDs as well as creation of cookies.
-//--------------------------------------------
-
+// Default Configuration Values
+// * Password Encryption Method: sha256
+// * Salt length in bits: 64
 package auth
 
 import (
-	"bufio"
+	"crypto/sha256"
 	"math/rand"
-	"net/http"
-	"os"
-	"strconv"
-	"strings"
-	"time"
 
-	"github.com/darwinfroese/networkobserver/pkg/settings"
+	"fmt"
 )
 
-var cookieName string = "NetObAuth"
+// Settings is a struct of all the cofiguration options
+// used for configuring the auth package
+type Settings struct {
+	EncryptionMethod string
+	SaltLength       int
+	UseSalt          bool
+}
 
-var loc string = settings.AppLocation
-var pwloc string = loc + "/.password"
-var cloc string = loc + "/.cookies"
+// Authenticator object for authentication
+type Authenticator interface {
+	Encrypt(string) (string, string, error)
+	Validate(string, string, string) (bool, error)
+}
 
-var cookieValues []int
+type authAdapter struct {
+}
 
-var rgen *rand.Rand
-var max = 999999
-var min = 111111
+var authSettings Settings
 
 func init() {
-	src := rand.NewSource(time.Now().UnixNano())
-	rgen = rand.New(src)
-
-	cookieValues = make([]int, 0)
+	authSettings = Settings{
+		EncryptionMethod: "sha256",
+		SaltLength:       64,
+		UseSalt:          true,
+	}
 }
 
-// Read the stored usernames and password hashes from the file
-func CheckCredentials(uname string, pword [32]byte) bool {
-	valid := false
-	file, _ := os.Open(pwloc)
-	defer file.Close()
+// NewAuthenticator returns a new authenticator that can be used for authenticating
+func NewAuthenticator(settings *Settings) (Authenticator, error) {
+	a := authAdapter{}
 
-	pws := string(pword[:])
-	scanner := bufio.NewScanner(file)
-
-	for scanner.Scan() {
-		str := scanner.Text()
-		line := strings.Split(str, ":")
-		pw := line[1]
-
-		if line[0] == uname && pw == pws {
-			valid = true
-			break
-		} else if line[0] == uname && pw == pws {
-			break
-		}
+	if settings != nil {
+		authSettings = *settings
 	}
 
-	return valid
+	return &a, nil
 }
 
-// Create a cookie with a life of one day
-func SetSessionID(w http.ResponseWriter) {
-	var value int
-
-	value = rgen.Intn(max-min) + min
-	for used(value) {
-		value = rgen.Intn(max-min) + min
+func (a *authAdapter) Encrypt(v string) (eValue, salt string, err error) {
+	if authSettings.UseSalt {
+		e, s := sha256WithSalt(v, "")
+		eValue = string(e[:])
+		salt = string(s[:])
+		return
 	}
 
-	expiration := time.Now().Add(time.Duration(24) * time.Hour)
-	cookie := http.Cookie{Name: cookieName, Value: strconv.Itoa(value), Expires: expiration}
-	http.SetCookie(w, &cookie)
+	e := sha256WithoutSalt(v)
+	eValue = string(e[:])
 
-	writeCookieValue(value)
+	return
 }
 
-// Check if there is a valid cookie stored
-func CheckSessionID(r *http.Request) bool {
-	cookie, _ := r.Cookie(cookieName)
+func (a *authAdapter) Validate(input, salt, password string) (valid bool, err error) {
+	var encryptedString string
+	valid = false
 
-	if cookie != nil {
-		return checkID(cookie.Value)
+	if authSettings.UseSalt {
+		e, _ := sha256WithSalt(input, salt)
+		encryptedString = string(e[:])
 	} else {
-		return false
+		e := sha256WithoutSalt(input)
+		encryptedString = string(e[:])
 	}
+
+	if encryptedString == password {
+		valid = true
+	}
+
+	return
 }
 
-func RemoveCookie(w http.ResponseWriter, r *http.Request) {
-	cookie, _ := r.Cookie(cookieName)
+func sha256WithoutSalt(value string) [sha256.Size]byte {
+	encrypted := sha256.Sum256([]byte(value))
 
-	if cookie != nil {
-		cookie.MaxAge = -1
-		http.SetCookie(w, cookie)
-	}
+	return encrypted
 }
 
-// Check if the ID is in the database of cookies
-func checkID(value string) bool {
-	valid := false
+func sha256WithSalt(value, saltValue string) ([sha256.Size]byte, []byte) {
+	salt := make([]byte, authSettings.SaltLength)
 
-	file, _ := os.Open(cloc)
-	defer file.Close()
+	if saltValue != "" {
+		salt = []byte(saltValue)
+	} else {
+		n, err := rand.Read(salt)
 
-	scanner := bufio.NewScanner(file)
+		if err != nil {
+			fmt.Println("There was an error generating a salt: ", err)
+			return [sha256.Size]byte{}, nil
+		}
 
-	for scanner.Scan() {
-		str := scanner.Text()
-
-		if str == value {
-			valid = true
-			break
+		if n != authSettings.SaltLength {
+			fmt.Printf("Only %d characters were read.\n", n)
+			return [sha256.Size]byte{}, nil
 		}
 	}
 
-	return valid
-}
+	saltedVal := append([]byte(value), salt...)
+	encrypted := sha256.Sum256(saltedVal)
 
-func UsernameInUse(uname string) bool {
-	used := false
-
-	file, _ := os.Open(pwloc)
-	defer file.Close()
-
-	scanner := bufio.NewScanner(file)
-
-	for scanner.Scan() {
-		str := scanner.Text()
-		line := strings.Split(str, ":")
-
-		if line[0] == uname {
-			used = true
-			break
-		}
-	}
-
-	return used
-}
-
-func SavePassword(uname string, pword [32]byte) {
-	file, _ := os.OpenFile(pwloc, os.O_APPEND|os.O_WRONLY, 0600)
-	defer file.Close()
-
-	w := bufio.NewWriter(file)
-	defer w.Flush()
-
-	w.WriteString(uname + ":" + string(pword[:]) + "\n")
-}
-
-func writeCookieValue(value int) {
-	file, _ := os.OpenFile(cloc, os.O_APPEND|os.O_WRONLY, 0600)
-	defer file.Close()
-
-	w := bufio.NewWriter(file)
-	defer w.Flush()
-
-	w.WriteString(strconv.Itoa(value) + "\n")
-	cookieValues = append(cookieValues, value)
-}
-
-func used(value int) bool {
-	for _, v := range cookieValues {
-		if v == value {
-			return true
-		}
-	}
-
-	return false
+	return encrypted, salt
 }
