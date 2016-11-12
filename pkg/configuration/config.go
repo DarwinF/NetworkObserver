@@ -16,6 +16,16 @@ import (
 // Structs
 //--------------------------------
 
+// Configurator interface
+type Configurator interface {
+	Update(*Configuration) (bool, error)
+	GetSettings() Configuration
+}
+
+type configAdapter struct {
+	settings Configuration
+}
+
 // SystemSettings - General system settings
 type SystemSettings struct {
 	DeviceIP string
@@ -67,27 +77,93 @@ type Configuration struct {
 // Variables
 //--------------------------------
 var loc = settings.AppLocation
-var configPath = loc + "/config.json"
+var defaultConfigPath = "./config.json"
 
 var updated = false
 var config Configuration
 
 // read the .json file into the correct structs
-func init() {
-	// Todo: use the error from here
-	file, _ := ioutil.ReadFile("./config.json")
+func setup() {
+	updated = true
 
-	// Todo: Grab the error from this
-	json.Unmarshal(file, &config)
+	if _, err := os.Stat(defaultConfigPath); os.IsNotExist(err) {
+		config = generateDefaultConfig()
+		writeToFile()
+		return
+	}
+
+	file, _ := ioutil.ReadFile(defaultConfigPath)
+	err := json.Unmarshal(file, &config)
+
+	if err != nil {
+		fmt.Printf("There was an error reading the config.json file located at: %s\n", defaultConfigPath)
+		config = generateDefaultConfig()
+		writeToFile()
+	}
 }
 
-// WriteToFile - Writes the configuration to file
-func WriteToFile() {
+// NewConfigurator creates a new configurator with the default or
+// saved configuration options
+func NewConfigurator() Configurator {
+	ca := configAdapter{}
+
+	setup()
+	ca.settings = config
+
+	return &ca
+}
+
+// Update is used to update the current configuration
+func (c *configAdapter) Update(config *Configuration) (bool, error) {
+
+	return false, nil
+}
+
+func (c *configAdapter) GetSettings() Configuration {
+	return c.settings
+}
+
+func generateDefaultConfig() (c Configuration) {
+	c = Configuration{
+		SystemSettings: SystemSettings{
+			DeviceIP: "127.0.0.1",
+			Port:     "8080",
+		},
+		TestSettings: TestSettings{
+			Configuration: DelaySettings{
+				PingDelay:      "60",
+				SpeedTestDelay: "60",
+			},
+			InternalAddresses: []taggedIP{
+				taggedIP{ID: "Localhost", Address: "127.0.0.1"},
+			},
+			ExternalAddresses: ExternalAddresses{
+				IPAddresses: []taggedIP{
+					taggedIP{ID: "Google DNS", Address: "8.8.8.8"},
+				},
+				URLAddresses: []taggedURL{
+					taggedURL{ID: "Google", URL: "www.google.ca"},
+				},
+			},
+			FileLocations: []taggedPath{
+				taggedPath{ID: "Speed Test Files", Path: "./Reports/SpeedTests/"},
+				taggedPath{ID: "Ping Test Files", Path: "./Reports/PingTests/"},
+			},
+		},
+	}
+
+	return
+}
+
+func writeToFile() {
 	if !updated {
 		return
 	}
 
-	file, _ := os.Create(configPath)
+	file, err := os.Create(defaultConfigPath)
+	if err != nil {
+		fmt.Println("There was an error creating the file: ", err)
+	}
 	defer file.Close()
 
 	w := bufio.NewWriter(file)
