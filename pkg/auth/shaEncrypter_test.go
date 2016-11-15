@@ -2,7 +2,7 @@ package auth
 
 import "testing"
 
-var encrypter Encrypter
+var enc encrypter
 var testPassword = "test password"
 
 func Test_SaltedDifferentFromUnsalted(t *testing.T) {
@@ -27,8 +27,8 @@ func Test_VerifyWorksWithSalting(t *testing.T) {
 	settings := shaSettings
 	setupEncrypter(&settings)
 
-	encrypted, salt, _ := encrypter.Encrypt(testPassword)
-	valid, _ := encrypter.Validate(testPassword, salt, encrypted)
+	encrypted, salt, _ := enc.Encrypt(testPassword)
+	valid, _ := enc.Validate(testPassword, salt, encrypted)
 
 	if !valid {
 		t.Fatal("The passwords didn't match")
@@ -40,8 +40,8 @@ func Test_VerifyWorksWithoutSalting(t *testing.T) {
 	settings.UseSalt = false
 
 	setupEncrypter(&settings)
-	encrypted, salt, _ := encrypter.Encrypt(testPassword)
-	valid, _ := encrypter.Validate(testPassword, salt, encrypted)
+	encrypted, salt, _ := enc.Encrypt(testPassword)
+	valid, _ := enc.Validate(testPassword, salt, encrypted)
 
 	if !valid {
 		t.Fatal("The passwords didn't match")
@@ -50,8 +50,8 @@ func Test_VerifyWorksWithoutSalting(t *testing.T) {
 
 func setupEncrypter(settings *Settings) {
 	if settings != nil {
-		encrypter, _ = NewShaEncrypter(settings)
+		enc, _ = newShaEncrypter(settings)
 	} else {
-		encrypter, _ = NewShaEncrypter(nil)
+		enc, _ = newShaEncrypter(nil)
 	}
 }

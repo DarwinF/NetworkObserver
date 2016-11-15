@@ -28,8 +28,8 @@ func init() {
 	}
 }
 
-// NewShaEncrypter returns a new authenticator that can be used for authenticating
-func NewShaEncrypter(settings *Settings) (Encrypter, error) {
+// newShaEncrypter returns a new authenticator that can be used for authenticating
+func newShaEncrypter(settings *Settings) (encrypter, error) {
 	a := shaAdapter{}
 
 	if settings != nil {
