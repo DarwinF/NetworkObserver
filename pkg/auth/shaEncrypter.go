@@ -1,9 +1,3 @@
-// Package auth provides functionality for authenticating
-// users to the system.
-//
-// Default Configuration Values
-// * Password Encryption Method: sha256
-// * Salt length in bits: 64
 package auth
 
 import (
@@ -21,38 +15,32 @@ type Settings struct {
 	UseSalt          bool
 }
 
-// Authenticator object for authentication
-type Authenticator interface {
-	Encrypt(string) (string, string, error)
-	Validate(string, string, string) (bool, error)
+type shaAdapter struct {
 }
 
-type authAdapter struct {
-}
-
-var authSettings Settings
+var shaSettings Settings
 
 func init() {
-	authSettings = Settings{
+	shaSettings = Settings{
 		EncryptionMethod: "sha256",
 		SaltLength:       64,
 		UseSalt:          true,
 	}
 }
 
-// NewAuthenticator returns a new authenticator that can be used for authenticating
-func NewAuthenticator(settings *Settings) (Authenticator, error) {
-	a := authAdapter{}
+// NewShaEncrypter returns a new authenticator that can be used for authenticating
+func NewShaEncrypter(settings *Settings) (Encrypter, error) {
+	a := shaAdapter{}
 
 	if settings != nil {
-		authSettings = *settings
+		shaSettings = *settings
 	}
 
 	return &a, nil
 }
 
-func (a *authAdapter) Encrypt(v string) (eValue, salt string, err error) {
-	if authSettings.UseSalt {
+func (a *shaAdapter) Encrypt(v string) (eValue, salt string, err error) {
+	if shaSettings.UseSalt {
 		e, s := sha256WithSalt(v, "")
 		eValue = string(e[:])
 		salt = string(s[:])
@@ -65,11 +53,11 @@ func (a *authAdapter) Encrypt(v string) (eValue, salt string, err error) {
 	return
 }
 
-func (a *authAdapter) Validate(input, salt, password string) (valid bool, err error) {
+func (a *shaAdapter) Validate(input, salt, password string) (valid bool, err error) {
 	var encryptedString string
 	valid = false
 
-	if authSettings.UseSalt {
+	if shaSettings.UseSalt {
 		e, _ := sha256WithSalt(input, salt)
 		encryptedString = string(e[:])
 	} else {
@@ -91,7 +79,7 @@ func sha256WithoutSalt(value string) [sha256.Size]byte {
 }
 
 func sha256WithSalt(value, saltValue string) ([sha256.Size]byte, []byte) {
-	salt := make([]byte, authSettings.SaltLength)
+	salt := make([]byte, shaSettings.SaltLength)
 
 	if saltValue != "" {
 		salt = []byte(saltValue)
@@ -103,7 +91,7 @@ func sha256WithSalt(value, saltValue string) ([sha256.Size]byte, []byte) {
 			return [sha256.Size]byte{}, nil
 		}
 
-		if n != authSettings.SaltLength {
+		if n != shaSettings.SaltLength {
 			fmt.Printf("Only %d characters were read.\n", n)
 			return [sha256.Size]byte{}, nil
 		}

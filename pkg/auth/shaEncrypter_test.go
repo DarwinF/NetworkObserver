@@ -2,7 +2,7 @@ package auth
 
 import "testing"
 
-var authenticator Authenticator
+var encrypter Encrypter
 var testPassword = "test password"
 
 func Test_SaltedDifferentFromUnsalted(t *testing.T) {
@@ -24,11 +24,11 @@ func Test_SaltingReturnsTheSameValues(t *testing.T) {
 }
 
 func Test_VerifyWorksWithSalting(t *testing.T) {
-	settings := authSettings
-	setupAuthenticator(&settings)
+	settings := shaSettings
+	setupEncrypter(&settings)
 
-	encrypted, salt, _ := authenticator.Encrypt(testPassword)
-	valid, _ := authenticator.Validate(testPassword, salt, encrypted)
+	encrypted, salt, _ := encrypter.Encrypt(testPassword)
+	valid, _ := encrypter.Validate(testPassword, salt, encrypted)
 
 	if !valid {
 		t.Fatal("The passwords didn't match")
@@ -36,22 +36,22 @@ func Test_VerifyWorksWithSalting(t *testing.T) {
 }
 
 func Test_VerifyWorksWithoutSalting(t *testing.T) {
-	settings := authSettings
+	settings := shaSettings
 	settings.UseSalt = false
 
-	setupAuthenticator(&settings)
-	encrypted, salt, _ := authenticator.Encrypt(testPassword)
-	valid, _ := authenticator.Validate(testPassword, salt, encrypted)
+	setupEncrypter(&settings)
+	encrypted, salt, _ := encrypter.Encrypt(testPassword)
+	valid, _ := encrypter.Validate(testPassword, salt, encrypted)
 
 	if !valid {
 		t.Fatal("The passwords didn't match")
 	}
 }
 
-func setupAuthenticator(settings *Settings) {
+func setupEncrypter(settings *Settings) {
 	if settings != nil {
-		authenticator, _ = NewAuthenticator(settings)
+		encrypter, _ = NewShaEncrypter(settings)
 	} else {
-		authenticator, _ = NewAuthenticator(nil)
+		encrypter, _ = NewShaEncrypter(nil)
 	}
 }
