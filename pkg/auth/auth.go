@@ -1,15 +1,31 @@
 package auth
 
+import (
+	"github.com/darwinfroese/networkobserver/pkg/settings"
+)
+
 func init() {
-
+	
 }
 
-func writeAuthToFile() {
+func readFile(fileLocation string) bool, error {
 
+	return false, nil
 }
 
-// NewAuthenticator returns a new baseAuthenticator
-func NewAuthenticator() Authenticator {
+func createFile(fileLocation string) bool, error {
 
-	return &baseAuthenticator{}
+	return false, nil
+}
+
+func writeUserToFile(username, password, salt string) bool, error {
+	return false, nil
+}
+
+func updateUsernameInFile(username, newUsername string) bool, error {
+	return false, nil
+}
+
+func updatePasswordInFile(username, password, salt string) bool, error {
+	return false, nil
 }
