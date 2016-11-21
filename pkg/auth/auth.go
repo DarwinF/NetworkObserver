@@ -3,44 +3,57 @@ package auth
 import (
 	"os"
 
+	"bufio"
+
+	"log"
+
 	"github.com/darwinfroese/networkobserver/pkg/settings"
 )
-
-var authDb *os.File
 
 func init() {
 	authDbLoc := settings.AuthenticationDBLocation + settings.AuthenticationDBName
 
 	if _, err := os.Stat(authDbLoc); os.IsNotExist(err) {
-		file, err := createFile(authDbLoc)
-
-		if err != nil {
-			panic(err.Error())
-		}
-
-		authDb = file
 		return
 	}
 
-	file, err := readFile(authDbLoc)
+	records, err := readFile(authDbLoc)
 
 	if err != nil {
-		panic(err.Error())
+		log.Panicf("Error reading users from file: %s\n%d Records were read in.", err.Error(), records)
+	}
+}
+
+func readFile(fileLocation string) (int, error) {
+	var records = 0
+	file, err := os.Open(fileLocation)
+	defer file.Close()
+
+	if err != nil {
+		return records, err
 	}
 
-	authDb = file
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := scanner.Text()
+		parseLineToUser(line)
+		records++
+	}
+
+	if err := scanner.Err(); err != nil {
+		return records, err
+	}
+
+	return records, nil
 }
 
-func readFile(fileLocation string) (*os.File, error) {
-	file, err := os.Open(fileLocation)
-
-	return file, err
+func createFile(fileLocation string) (bool, error) {
+	return false, nil
 }
 
-func createFile(fileLocation string) (*os.File, error) {
-	file, err := os.Create(fileLocation)
+func parseLineToUser(line string) (bool, error) {
 
-	return file, err
+	return false, nil
 }
 
 func writeUserToFile(username, password, salt string) (bool, error) {
