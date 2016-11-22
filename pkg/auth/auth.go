@@ -11,8 +11,10 @@ import (
 	"github.com/darwinfroese/networkobserver/pkg/settings"
 )
 
+var authDbLoc string
+
 func init() {
-	authDbLoc := settings.AuthenticationDBLocation + settings.AuthenticationDBName
+	authDbLoc = settings.AuthenticationDBLocation + settings.AuthenticationDBName
 
 	if _, err := os.Stat(authDbLoc); os.IsNotExist(err) {
 		err := createFile(authDbLoc)
@@ -76,13 +78,41 @@ func parseLineToUser(line string) (bool, error) {
 }
 
 func writeUserToFile(username, password, salt string) (bool, error) {
-	return false, nil
+	line := username + "," + password + "," + salt
+	file, err := os.Open(authDbLoc)
+
+	if err != nil {
+		log.Panicf("Couldn't open the database for writing.\n%s", err.Error())
+	}
+
+	_, err = file.Write([]byte(line))
+
+	if err != nil {
+		log.Panicf("Couldn't write the record to the database.\n%s", err.Error())
+	}
+
+	return true, nil
 }
 
-func updateUsernameInFile(username, newUsername string) (bool, error) {
-	return false, nil
+func updateUsername(username, newUsername string) bool {
+	for i := range authDatabaseEntries {
+		if authDatabaseEntries[i].Username == username {
+			authDatabaseEntries[i].Username = newUsername
+			return true
+		}
+	}
+
+	return false
 }
 
-func updatePasswordInFile(username, password, salt string) (bool, error) {
-	return false, nil
+func updatePassword(username, password, salt string) bool {
+	for i := range authDatabaseEntries {
+		if authDatabaseEntries[i].Username == username {
+			authDatabaseEntries[i].Password = password
+			authDatabaseEntries[i].Salt = salt
+			return true
+		}
+	}
+
+	return false
 }
