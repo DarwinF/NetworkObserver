@@ -41,6 +41,8 @@ func readFile(fileLocation string) (int, error) {
 		return records, err
 	}
 
+	defer file.Close()
+
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		line := scanner.Text()
@@ -48,8 +50,7 @@ func readFile(fileLocation string) (int, error) {
 		records++
 	}
 
-	file.Close()
-	return records, err
+	return records, nil
 }
 
 func createFile(fileLocation string) error {
@@ -77,6 +78,30 @@ func parseLineToUser(line string) (bool, error) {
 	return true, nil
 }
 
+func writeAllUsersToFile() (int, error) {
+	records := 0
+	file, err := os.Open(authDbLoc)
+
+	if err != nil {
+		return records, err
+	}
+
+	defer file.Close()
+
+	for i := range authDatabaseEntries {
+		line := authDatabaseEntries[i].Username + "," + authDatabaseEntries[i].Password + "," + authDatabaseEntries[i].Salt
+		_, err := file.WriteString(line)
+
+		if err != nil {
+			return records, err
+		}
+
+		records++
+	}
+
+	return records, nil
+}
+
 func writeUserToFile(username, password, salt string) (bool, error) {
 	line := username + "," + password + "," + salt
 	file, err := os.Open(authDbLoc)
@@ -85,7 +110,7 @@ func writeUserToFile(username, password, salt string) (bool, error) {
 		log.Panicf("Couldn't open the database for writing.\n%s", err.Error())
 	}
 
-	_, err = file.Write([]byte(line))
+	_, err = file.WriteString(line)
 
 	if err != nil {
 		log.Panicf("Couldn't write the record to the database.\n%s", err.Error())
