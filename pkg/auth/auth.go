@@ -26,14 +26,14 @@ func init() {
 		return
 	}
 
-	records, err := readFile(authDbLoc)
+	records, err := readFile(authDatabaseEntries, authDbLoc)
 
 	if err != nil {
 		log.Panicf("Error reading users from file: %s\n%d Records were read in.", err.Error(), records)
 	}
 }
 
-func readFile(fileLocation string) (int, error) {
+func readFile(users []User, fileLocation string) (int, error) {
 	var records = 0
 	file, err := os.Open(fileLocation)
 
@@ -46,7 +46,7 @@ func readFile(fileLocation string) (int, error) {
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		line := scanner.Text()
-		parseLineToUser(line)
+		parseLineToUser(users, line)
 		records++
 	}
 
@@ -59,7 +59,7 @@ func createFile(fileLocation string) error {
 	return err
 }
 
-func parseLineToUser(line string) (bool, error) {
+func parseLineToUser(users []User, line string) (bool, error) {
 	data := strings.Split(line, ",")
 
 	if len(data) != 3 {
@@ -73,12 +73,12 @@ func parseLineToUser(line string) (bool, error) {
 		Salt:     data[2],
 	}
 
-	authDatabaseEntries = append(authDatabaseEntries, user)
+	users = append(users, user)
 
 	return true, nil
 }
 
-func writeAllUsersToFile() (int, error) {
+func writeAllUsersToFile(users []User) (int, error) {
 	records := 0
 	file, err := os.Open(authDbLoc)
 
@@ -88,8 +88,8 @@ func writeAllUsersToFile() (int, error) {
 
 	defer file.Close()
 
-	for i := range authDatabaseEntries {
-		line := authDatabaseEntries[i].Username + "," + authDatabaseEntries[i].Password + "," + authDatabaseEntries[i].Salt
+	for i := range users {
+		line := users[i].Username + "," + users[i].Password + "," + users[i].Salt
 		_, err := file.WriteString(line)
 
 		if err != nil {
@@ -119,10 +119,10 @@ func writeUserToFile(username, password, salt string) (bool, error) {
 	return true, nil
 }
 
-func updateUsername(username, newUsername string) bool {
-	for i := range authDatabaseEntries {
-		if authDatabaseEntries[i].Username == username {
-			authDatabaseEntries[i].Username = newUsername
+func updateUsername(users []User, username, newUsername string) bool {
+	for i := range users {
+		if users[i].Username == username {
+			users[i].Username = newUsername
 			return true
 		}
 	}
@@ -130,11 +130,11 @@ func updateUsername(username, newUsername string) bool {
 	return false
 }
 
-func updatePassword(username, password, salt string) bool {
-	for i := range authDatabaseEntries {
-		if authDatabaseEntries[i].Username == username {
-			authDatabaseEntries[i].Password = password
-			authDatabaseEntries[i].Salt = salt
+func updatePassword(users []User, username, password, salt string) bool {
+	for i := range users {
+		if users[i].Username == username {
+			users[i].Password = password
+			users[i].Salt = salt
 			return true
 		}
 	}
