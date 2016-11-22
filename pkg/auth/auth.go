@@ -1,11 +1,9 @@
 package auth
 
 import (
-	"os"
-
 	"bufio"
-
 	"log"
+	"os"
 
 	"github.com/darwinfroese/networkobserver/pkg/settings"
 )
@@ -14,6 +12,12 @@ func init() {
 	authDbLoc := settings.AuthenticationDBLocation + settings.AuthenticationDBName
 
 	if _, err := os.Stat(authDbLoc); os.IsNotExist(err) {
+		err := createFile(authDbLoc)
+
+		if err != nil {
+			log.Panicf("Error creating the file: %s\n%s", authDbLoc, err.Error())
+		}
+
 		return
 	}
 
@@ -27,7 +31,6 @@ func init() {
 func readFile(fileLocation string) (int, error) {
 	var records = 0
 	file, err := os.Open(fileLocation)
-	defer file.Close()
 
 	if err != nil {
 		return records, err
@@ -40,15 +43,14 @@ func readFile(fileLocation string) (int, error) {
 		records++
 	}
 
-	if err := scanner.Err(); err != nil {
-		return records, err
-	}
-
-	return records, nil
+	file.Close()
+	return records, err
 }
 
-func createFile(fileLocation string) (bool, error) {
-	return false, nil
+func createFile(fileLocation string) error {
+	_, err := os.Create(fileLocation)
+
+	return err
 }
 
 func parseLineToUser(line string) (bool, error) {
