@@ -2,8 +2,11 @@ package auth
 
 import (
 	"bufio"
+	"errors"
+	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/darwinfroese/networkobserver/pkg/settings"
 )
@@ -54,8 +57,22 @@ func createFile(fileLocation string) error {
 }
 
 func parseLineToUser(line string) (bool, error) {
+	data := strings.Split(line, ",")
 
-	return false, nil
+	if len(data) != 3 {
+		msg := fmt.Sprintf("Invalid database entry: %s", line)
+		return false, errors.New(msg)
+	}
+
+	user := User{
+		Username: data[0],
+		Password: data[1],
+		Salt:     data[2],
+	}
+
+	authDatabaseEntries = append(authDatabaseEntries, user)
+
+	return true, nil
 }
 
 func writeUserToFile(username, password, salt string) (bool, error) {

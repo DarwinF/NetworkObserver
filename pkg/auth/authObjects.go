@@ -1,5 +1,7 @@
 package auth
 
+var authDatabaseEntries []User
+
 // Authenticator is an interface for base authentication methods
 type Authenticator interface {
 	Login(User) (bool, error)
