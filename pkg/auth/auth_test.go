@@ -50,7 +50,7 @@ func Test_AccountsReadFromFile(t *testing.T) {
 		t.Errorf("Failed to read %d users from file. Total users read: %d", testUserCount, usersRead)
 	}
 
-	cleanupTests()
+	//cleanupTests()
 }
 
 func Test_UsernameIsUpdatedInFile(t *testing.T) {

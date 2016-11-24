@@ -2,11 +2,13 @@ package auth
 
 var authDatabaseEntries []User
 
-// usernameMaxLen - Max length of the username, for padding
-var usernameMaxLen = 32
+// Field lengths
+var usernameMaxLen = 64
+var passwordMaxLen = 32
+var saltMaxLen = 64
 
 // dbEntryLineLen - Length of a database line
-var dbEntryLineLen = 32*3 + 2
+var dbEntryLineLen = usernameMaxLen + passwordMaxLen + saltMaxLen + 2
 
 // Authenticator is an interface for base authentication methods
 type Authenticator interface {

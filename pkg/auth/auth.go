@@ -33,6 +33,8 @@ func init() {
 
 func readFile(fileLocation string) (int, error) {
 	var records = 0
+	var offset = 0
+
 	file, err := os.Open(fileLocation)
 
 	if err != nil {
@@ -43,8 +45,9 @@ func readFile(fileLocation string) (int, error) {
 	defer file.Close()
 
 	// TODO: Refactor this into something better
-	buffer := make([]byte, 32*3+2)
-	for n, err := file.Read(buffer); n > 0 && err != nil; {
+	buffer := make([]byte, dbEntryLineLen)
+	for n, _ := file.ReadAt(buffer, int64(offset)); n > 0; offset += dbEntryLineLen {
+		log.Printf("[INFO] Offset: %d", offset)
 		parseLineToUser(buffer)
 		records++
 	}
@@ -61,9 +64,9 @@ func createFile(fileLocation string) error {
 
 func parseLineToUser(line []byte) (bool, error) {
 	user := User{
-		Username: line[:32],
-		Password: line[33:65],
-		Salt:     line[66:],
+		Username: line[:usernameMaxLen],
+		Password: line[usernameMaxLen+1 : usernameMaxLen+passwordMaxLen+1],
+		Salt:     line[usernameMaxLen+passwordMaxLen+2:],
 	}
 
 	authDatabaseEntries = append(authDatabaseEntries, user)
@@ -162,10 +165,9 @@ func updatePassword(username, password, salt []byte) bool {
 }
 
 func makeByteSliceFromUser(user User) []byte {
-	line := make([]byte, dbEntryLineLen)
+	var line []byte
 
 	line = append(line, getUsername(user.Username)...)
-
 	line = append(line, []byte(",")...)
 	line = append(line, user.Password...)
 	line = append(line, []byte(",")...)
@@ -181,7 +183,7 @@ func getUsername(username []byte) []byte {
 
 	newUsername := make([]byte, usernameMaxLen)
 
-	newUsername = append(newUsername, username...)
+	copy(newUsername, username)
 
 	for i := len(username); i < usernameMaxLen; i++ {
 		newUsername[i] = '\x00'

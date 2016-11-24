@@ -24,7 +24,7 @@ var shaSettings Settings
 func init() {
 	shaSettings = Settings{
 		EncryptionMethod: "sha256",
-		SaltLength:       64,
+		SaltLength:       saltMaxLen,
 		UseSalt:          true,
 	}
 }
@@ -42,6 +42,7 @@ func newShaEncrypter(settings *Settings) (encrypter, error) {
 
 func (a *shaAdapter) Encrypt(v []byte) (eValue, salt []byte, err error) {
 	e, s := sha256WithSalt(v, nil)
+
 	eValue = e[:]
 	salt = s
 	return
