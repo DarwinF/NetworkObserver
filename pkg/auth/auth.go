@@ -53,8 +53,9 @@ func readFile(fileLocation string) (int, error) {
 }
 
 func createFile(fileLocation string) error {
-	_, err := os.Create(fileLocation)
+	file, err := os.Create(fileLocation)
 
+	file.Close()
 	return err
 }
 
@@ -75,13 +76,14 @@ func writeAllUsersToFile() (int, error) {
 	file, err := os.OpenFile(authDbLoc, os.O_WRONLY, 0777)
 
 	if err != nil {
+		log.Printf("[Error] Couldn't open the database for writing. %s", err.Error())
 		return records, err
 	}
 
 	defer file.Close()
 
 	for i := range authDatabaseEntries {
-		success, err := writeUserToFile(authDatabaseEntries[i])
+		success, err := writeUserToFile(authDatabaseEntries[i], file)
 
 		if success {
 			records++
@@ -93,16 +95,12 @@ func writeAllUsersToFile() (int, error) {
 	return records, nil
 }
 
-func writeUserToFile(user User) (bool, error) {
+func writeUserToFile(user User, file *os.File) (bool, error) {
 	line := makeByteSliceFromUser(user)
-	file, err := os.Open(authDbLoc)
 
-	if err != nil {
-		log.Printf("Couldn't open the database for writing.\n%s", err.Error())
-		return false, err
-	}
+	n, err := file.Write(line)
 
-	_, err = file.Write(line)
+	log.Printf("[INFO] Wrote %d bytes to the file\n", n)
 
 	if err != nil {
 		log.Printf("Couldn't write the record to the database.\n%s", err.Error())
@@ -114,7 +112,7 @@ func writeUserToFile(user User) (bool, error) {
 
 func updateUserInFile(user User, offset int64) (bool, error) {
 	line := makeByteSliceFromUser(user)
-	file, err := os.Open(authDbLoc)
+	file, err := os.OpenFile(authDbLoc, os.O_WRONLY, 0777)
 
 	if err != nil {
 		log.Printf("Couldn't open the database for updating.\n%s", err.Error())
