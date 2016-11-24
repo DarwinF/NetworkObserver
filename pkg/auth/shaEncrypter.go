@@ -41,16 +41,9 @@ func newShaEncrypter(settings *Settings) (encrypter, error) {
 }
 
 func (a *shaAdapter) Encrypt(v []byte) (eValue, salt []byte, err error) {
-	if shaSettings.UseSalt {
-		e, s := sha256WithSalt(v, nil)
-		eValue = e[:]
-		salt = s
-		return
-	}
-
-	e := sha256WithoutSalt(v)
+	e, s := sha256WithSalt(v, nil)
 	eValue = e[:]
-
+	salt = s
 	return
 }
 
@@ -58,25 +51,14 @@ func (a *shaAdapter) Validate(input, salt, password []byte) (valid bool, err err
 	var encryptedString []byte
 	valid = false
 
-	if shaSettings.UseSalt {
-		e, _ := sha256WithSalt(input, salt)
-		encryptedString = e[:]
-	} else {
-		e := sha256WithoutSalt(input)
-		encryptedString = e[:]
-	}
+	e, _ := sha256WithSalt(input, salt)
+	encryptedString = e[:]
 
 	if bytes.Equal(encryptedString, password) {
 		valid = true
 	}
 
 	return
-}
-
-func sha256WithoutSalt(value []byte) [sha256.Size]byte {
-	encrypted := sha256.Sum256([]byte(value))
-
-	return encrypted
 }
 
 func sha256WithSalt(value, saltValue []byte) ([sha256.Size]byte, []byte) {
