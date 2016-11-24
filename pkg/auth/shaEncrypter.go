@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	"math/rand"
 
+	"bytes"
 	"fmt"
 )
 
@@ -39,49 +40,49 @@ func newShaEncrypter(settings *Settings) (encrypter, error) {
 	return &a, nil
 }
 
-func (a *shaAdapter) Encrypt(v string) (eValue, salt string, err error) {
+func (a *shaAdapter) Encrypt(v []byte) (eValue, salt []byte, err error) {
 	if shaSettings.UseSalt {
-		e, s := sha256WithSalt(v, "")
-		eValue = string(e[:])
-		salt = string(s[:])
+		e, s := sha256WithSalt(v, nil)
+		eValue = e[:]
+		salt = s
 		return
 	}
 
 	e := sha256WithoutSalt(v)
-	eValue = string(e[:])
+	eValue = e[:]
 
 	return
 }
 
-func (a *shaAdapter) Validate(input, salt, password string) (valid bool, err error) {
-	var encryptedString string
+func (a *shaAdapter) Validate(input, salt, password []byte) (valid bool, err error) {
+	var encryptedString []byte
 	valid = false
 
 	if shaSettings.UseSalt {
 		e, _ := sha256WithSalt(input, salt)
-		encryptedString = string(e[:])
+		encryptedString = e[:]
 	} else {
 		e := sha256WithoutSalt(input)
-		encryptedString = string(e[:])
+		encryptedString = e[:]
 	}
 
-	if encryptedString == password {
+	if bytes.Equal(encryptedString, password) {
 		valid = true
 	}
 
 	return
 }
 
-func sha256WithoutSalt(value string) [sha256.Size]byte {
+func sha256WithoutSalt(value []byte) [sha256.Size]byte {
 	encrypted := sha256.Sum256([]byte(value))
 
 	return encrypted
 }
 
-func sha256WithSalt(value, saltValue string) ([sha256.Size]byte, []byte) {
+func sha256WithSalt(value, saltValue []byte) ([sha256.Size]byte, []byte) {
 	salt := make([]byte, shaSettings.SaltLength)
 
-	if saltValue != "" {
+	if saltValue != nil {
 		salt = []byte(saltValue)
 	} else {
 		n, err := rand.Read(salt)

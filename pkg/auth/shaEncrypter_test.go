@@ -3,10 +3,10 @@ package auth
 import "testing"
 
 var enc encrypter
-var testPassword = "test password"
+var testPassword = []byte("test password")
 
 func Test_SaltedDifferentFromUnsalted(t *testing.T) {
-	salted, _ := sha256WithSalt(testPassword, "")
+	salted, _ := sha256WithSalt(testPassword, nil)
 	unsalted := sha256WithoutSalt(testPassword)
 
 	if salted == unsalted {
@@ -15,8 +15,8 @@ func Test_SaltedDifferentFromUnsalted(t *testing.T) {
 }
 
 func Test_SaltingReturnsTheSameValues(t *testing.T) {
-	salted1, salt := sha256WithSalt(testPassword, "")
-	salted2, _ := sha256WithSalt(testPassword, string(salt[:]))
+	salted1, salt := sha256WithSalt(testPassword, nil)
+	salted2, _ := sha256WithSalt(testPassword, salt[:])
 
 	if salted1 != salted2 {
 		t.Fatal("The salted passwords were not the same")
