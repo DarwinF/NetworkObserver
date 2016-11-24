@@ -2,6 +2,9 @@ package auth
 
 var authDatabaseEntries []User
 
+// usernameMaxLen - Max length of the username, for padding
+var usernameMaxLen = 32
+
 // dbEntryLineLen - Length of a database line
 var dbEntryLineLen = 32*3 + 2
 

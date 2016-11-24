@@ -165,11 +165,29 @@ func updatePassword(username, password, salt []byte) bool {
 
 func makeByteSliceFromUser(user User) []byte {
 	line := make([]byte, dbEntryLineLen)
-	line = append(line, user.Username...)
+
+	line = append(line, getUsername(user.Username)...)
+
 	line = append(line, []byte(",")...)
 	line = append(line, user.Password...)
 	line = append(line, []byte(",")...)
 	line = append(line, user.Salt...)
 
 	return line
+}
+
+func getUsername(username []byte) []byte {
+	if len(username) == usernameMaxLen {
+		return username
+	}
+
+	newUsername := make([]byte, usernameMaxLen)
+
+	newUsername = append(newUsername, username...)
+
+	for i := len(username); i < usernameMaxLen; i++ {
+		newUsername[i] = '\x00'
+	}
+
+	return newUsername
 }
