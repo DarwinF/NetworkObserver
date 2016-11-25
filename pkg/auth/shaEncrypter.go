@@ -2,9 +2,10 @@ package auth
 
 import (
 	"crypto/sha256"
+	"log"
 	"math/rand"
 
-	"bytes"
+	"encoding/base64"
 	"fmt"
 )
 
@@ -40,21 +41,29 @@ func newShaEncrypter(settings *Settings) (encrypter, error) {
 	return &a, nil
 }
 
-func (a *shaAdapter) Encrypt(v []byte) (eValue, salt []byte, err error) {
-	e, s := sha256WithSalt(v, nil)
-	eValue = e[:]
-	salt = s
-	return
+func (a *shaAdapter) Encrypt(input string) (eValue, salt string) {
+	e, s := sha256WithSalt([]byte(input), nil)
+
+	eStr := base64.StdEncoding.EncodeToString(e[:])
+	sStr := base64.StdEncoding.EncodeToString(s)
+
+	return eStr, sStr
 }
 
-func (a *shaAdapter) Validate(input, salt, password []byte) (valid bool, err error) {
-	var encryptedString []byte
+func (a *shaAdapter) Validate(input, salt, password string) (valid bool) {
+	var encryptedString string
 	valid = false
 
-	e, _ := sha256WithSalt(input, salt)
-	encryptedString = e[:]
+	decoded, err := base64.StdEncoding.DecodeString(salt)
 
-	if bytes.Equal(encryptedString, password) {
+	if err != nil {
+		log.Printf("[ERROR] There was an error decoding the string %s\n", err.Error())
+		return false
+	}
+	e, _ := sha256WithSalt([]byte(input), decoded)
+	encryptedString = base64.StdEncoding.EncodeToString(e[:])
+
+	if encryptedString == password {
 		valid = true
 	}
 

@@ -17,15 +17,15 @@ type Authenticator interface {
 
 // encrypter interface for different encryption methods
 type encrypter interface {
-	Encrypt([]byte) ([]byte, []byte, error)
-	Validate([]byte, []byte, []byte) (bool, error)
+	Encrypt(string) (string, string)
+	Validate(string, string, string) bool
 }
 
 // User stores user authentication information
 type User struct {
-	Username []byte
-	Password []byte
-	Salt     []byte
+	Username string
+	Password string
+	Salt     string
 }
 
 type baseAuthenticator struct {
