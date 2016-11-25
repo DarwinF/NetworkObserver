@@ -25,7 +25,7 @@ var shaSettings Settings
 func init() {
 	shaSettings = Settings{
 		EncryptionMethod: "sha256",
-		SaltLength:       64,
+		SaltLength:       saltMaxLen,
 		UseSalt:          true,
 	}
 }

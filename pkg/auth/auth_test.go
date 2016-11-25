@@ -99,7 +99,6 @@ func Test_PasswordIsUpdatedInFile(t *testing.T) {
 	log.Println("Testing that password changes are saved to file.")
 
 	enc, _ := newShaEncrypter(&shaSettings)
-	user := "Test User 4"
 	newPassword := "new passw0rd"
 
 	err := setupTest()
@@ -108,6 +107,7 @@ func Test_PasswordIsUpdatedInFile(t *testing.T) {
 		t.Errorf("An error occured setting up the test: %s", err.Error())
 	}
 
+	user := authDatabaseEntries[3].Username
 	oldPass := authDatabaseEntries[3].Password
 	oldSalt := authDatabaseEntries[3].Salt
 	pass, salt := enc.Encrypt(newPassword)

@@ -2,6 +2,8 @@ package auth
 
 var authDatabaseEntries []User
 
+var saltMaxLen = 64
+
 // Authenticator is an interface for base authentication methods
 type Authenticator interface {
 	Login(User) (bool, error)

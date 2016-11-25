@@ -34,6 +34,7 @@ func init() {
 
 func readFile(fileLocation string) (int, error) {
 	var records = 0
+
 	file, err := os.Open(fileLocation)
 
 	if err != nil {
