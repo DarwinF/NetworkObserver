@@ -1,10 +1,11 @@
 package auth
 
 import (
+	"bufio"
+	"fmt"
 	"log"
 	"os"
-
-	"bytes"
+	"strings"
 
 	"github.com/darwinfroese/networkobserver/pkg/settings"
 )
@@ -42,11 +43,15 @@ func readFile(fileLocation string) (int, error) {
 	authDatabaseEntries = []User{}
 	defer file.Close()
 
-	// TODO: Refactor this into something better
-	buffer := make([]byte, 32*3+2)
-	for n, err := file.Read(buffer); n > 0 && err != nil; {
-		parseLineToUser(buffer)
-		records++
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := scanner.Text()
+		user, success := parseLineToUser(line)
+
+		if success {
+			authDatabaseEntries = append(authDatabaseEntries, user)
+			records++
+		}
 	}
 
 	return records, nil
@@ -59,16 +64,20 @@ func createFile(fileLocation string) error {
 	return err
 }
 
-func parseLineToUser(line []byte) (bool, error) {
-	user := User{
-		Username: line[:32],
-		Password: line[33:65],
-		Salt:     line[66:],
+func parseLineToUser(line string) (User, bool) {
+	fields := strings.Split(line, ":")
+
+	if len(fields) != 3 {
+		return User{}, false
 	}
 
-	authDatabaseEntries = append(authDatabaseEntries, user)
+	user := User{
+		Username: fields[0],
+		Password: fields[1],
+		Salt:     fields[2],
+	}
 
-	return true, nil
+	return user, true
 }
 
 func writeAllUsersToFile() (int, error) {
@@ -83,109 +92,57 @@ func writeAllUsersToFile() (int, error) {
 	defer file.Close()
 
 	for i := range authDatabaseEntries {
-		success, err := writeUserToFile(authDatabaseEntries[i], file)
-
-		if success {
-			records++
-		} else {
-			log.Printf("[Error] Couldn't write entry to database. %s", err.Error())
-		}
+		writeUserToFile(authDatabaseEntries[i], file)
+		records++
 	}
 
 	return records, nil
 }
 
-func writeUserToFile(user User, file *os.File) (bool, error) {
-	line := makeByteSliceFromUser(user)
+func writeUserToFile(user User, file *os.File) {
+	line := userToString(user)
 
-	n, err := file.Write(line)
+	w := bufio.NewWriter(file)
 
-	log.Printf("[INFO] Wrote %d bytes to the file\n", n)
-
-	if err != nil {
-		log.Printf("Couldn't write the record to the database.\n%s", err.Error())
-		return false, err
-	}
-
-	return true, nil
+	fmt.Fprintf(w, "%s\n", line)
+	w.Flush()
 }
 
-func updateUserInFile(user User, offset int64) (bool, error) {
-	line := makeByteSliceFromUser(user)
-	file, err := os.OpenFile(authDbLoc, os.O_WRONLY, 0777)
-
-	if err != nil {
-		log.Printf("Couldn't open the database for updating.\n%s", err.Error())
-		return false, err
-	}
-
-	_, err = file.WriteAt(line, offset)
-
-	if err != nil {
-		log.Printf("Couldn't update the database at offest: %d\n%s", offset, err.Error())
-		return false, err
-	}
-
-	return true, nil
-}
-
-func updateUsername(username, newUsername []byte) bool {
+func updateUsername(username, newUsername string) bool {
 	var updated = false
 	for i := range authDatabaseEntries {
-		if bytes.Equal(authDatabaseEntries[i].Username, username) {
+		if authDatabaseEntries[i].Username == username {
 			authDatabaseEntries[i].Username = newUsername
-			updateUserInFile(authDatabaseEntries[i], int64(dbEntryLineLen*i))
 			updated = true
 		}
 	}
 
-	written, err := writeAllUsersToFile()
-
-	if err != nil {
-		log.Printf("[ERROR] Couldn't write updated users to file. %d users written.\n%s", written, err.Error())
-		updated = false
+	if updated {
+		writeAllUsersToFile()
 	}
 
 	return updated
 }
 
-func updatePassword(username, password, salt []byte) bool {
+func updatePassword(username, password, salt string) bool {
+	var updated = false
 	for i := range authDatabaseEntries {
-		if bytes.Equal(authDatabaseEntries[i].Username, username) {
+		if authDatabaseEntries[i].Username == username {
 			authDatabaseEntries[i].Password = password
 			authDatabaseEntries[i].Salt = salt
-			return true
+			updated = true
 		}
 	}
 
-	return false
+	if updated {
+		writeAllUsersToFile()
+	}
+
+	return updated
 }
 
-func makeByteSliceFromUser(user User) []byte {
-	line := make([]byte, dbEntryLineLen)
-
-	line = append(line, getUsername(user.Username)...)
-
-	line = append(line, []byte(",")...)
-	line = append(line, user.Password...)
-	line = append(line, []byte(",")...)
-	line = append(line, user.Salt...)
+func userToString(user User) string {
+	line := user.Username + ":" + user.Password + ":" + user.Salt
 
 	return line
-}
-
-func getUsername(username []byte) []byte {
-	if len(username) == usernameMaxLen {
-		return username
-	}
-
-	newUsername := make([]byte, usernameMaxLen)
-
-	newUsername = append(newUsername, username...)
-
-	for i := len(username); i < usernameMaxLen; i++ {
-		newUsername[i] = '\x00'
-	}
-
-	return newUsername
 }

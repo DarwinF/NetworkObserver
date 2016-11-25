@@ -1,7 +1,7 @@
 package auth
 
 import (
-	"bytes"
+	"log"
 	"testing"
 )
 
@@ -9,28 +9,25 @@ var enc encrypter
 var testPassword = "test password"
 
 func Test_SaltingIsRandom(t *testing.T) {
-	salted1, salt1 := sha256WithSalt([]byte(testPassword), nil)
-	salted2, salt2 := sha256WithSalt([]byte(testPassword), nil)
+	log.Println("Testing that salting is random.")
 
-	if bytes.Equal(salted1[:], salted2[:]) {
+	settings := shaSettings
+	setupEncrypter(&settings)
+
+	encrypted1, salt1 := enc.Encrypt(testPassword)
+	encrypted2, salt2 := enc.Encrypt(testPassword)
+
+	if encrypted1 == encrypted2 {
 		t.Fatal("The salted passwords are the same")
 	}
 
-	if bytes.Equal(salt1[:], salt2[:]) {
+	if salt1 == salt2 {
 		t.Fatal("The salt values are the same")
 	}
 }
 
-func Test_SaltingReturnsTheSameValues(t *testing.T) {
-	salted1, salt := sha256WithSalt([]byte(testPassword), nil)
-	salted2, _ := sha256WithSalt([]byte(testPassword), salt[:])
-
-	if !bytes.Equal(salted1[:], salted2[:]) {
-		t.Fatal("The salted passwords were not the same")
-	}
-}
-
 func Test_VerifyWorksWithSalting(t *testing.T) {
+	log.Println("Testing that using the same salt will return the same encrypted value.")
 	settings := shaSettings
 	setupEncrypter(&settings)
 
