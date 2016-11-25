@@ -31,7 +31,7 @@ type ReportData struct {
 
 var file *os.File
 var rd ReportData
-var loc string = settings.AppLocation + "/Reports/"
+var loc string = settings.ReportLocation
 var rf string = loc + "report.xml"
 
 func init() {

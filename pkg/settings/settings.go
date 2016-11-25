@@ -1,6 +1,13 @@
 package settings
 
-//var AppLocation string = "/var/lib/network_observer"
+// AuthenticationDBLocation - Location of the authentication database file
+var AuthenticationDBLocation = "./"
 
-// AppLocation - location of application files; should be root
-var AppLocation = "../"
+// AuthenticationDBName - Name of the authentication database file
+var AuthenticationDBName = "user_info.db"
+
+// LogLocation - Folder where all the log files should be stored
+var LogLocation = "./Logs"
+
+// ReportLocation - Folder where all the report files should be stored
+var ReportLocation = "./Reports"
