@@ -3,12 +3,41 @@ package auth
 import "testing"
 import "log"
 
-func Test_BaseAuthenticatorLogin(t *testing.T) {
-	log.Printf("Testing logging in with the base authenticator")
+func Test_BaseAuthenticatorLoginIsSuccessful(t *testing.T) {
+	log.Printf("Testing logging in with the base authenticator.")
+	authenticator := testSetupWithDefaultUser()
+
+	loggedIn, err := authenticator.Login(defaultUsername, defaultPassword)
+
+	if !loggedIn {
+		t.Errorf("Couldn't log into the account.\n%s", err.Error())
+	}
 }
 
-func Test_BaseAuthenticatorCreateAccount(t *testing.T) {
-	log.Printf("Testing creating an account with the base authenticator")
+func Test_BaseAuthenticatorLoginFailsWithIncorrectPassword(t *testing.T) {
+	log.Printf("Testing logging in with an incorrect password fails.")
+	authenticator := testSetupWithDefaultUser()
+
+	loggedIn, err := authenticator.Login(defaultUsername, "incorrect password")
+
+	if loggedIn {
+		t.Errorf("Logged into the account with the wrong password.\n%s", err.Error())
+	}
+}
+
+func Test_BaseAuthenticatorLoginFailsWithUnusedUsername(t *testing.T) {
+	log.Printf("Testing logging in with an unused username fails.")
+	authenticator := testSetupWithDefaultUser()
+
+	loggedIn, err := authenticator.Login("incorrect user", defaultPassword)
+
+	if loggedIn {
+		t.Errorf("Logged into an account that didn't exist.\n%s", err.Error())
+	}
+}
+
+func Test_BaseAuthenticatorCreateAccountIsSuccessful(t *testing.T) {
+	log.Printf("Testing creating an account with the base authenticator.")
 	authenticator := testSetup()
 
 	created, err := authenticator.CreateUser(defaultUsername, defaultPassword)
@@ -36,12 +65,20 @@ func Test_BaseAuthenticatorDoesntAllowTheSameUsername(t *testing.T) {
 }
 
 func Test_BaseAuthenticatorUpdatePassword(t *testing.T) {
-	log.Printf("Testing updating a password with the base authenticator")
+	log.Printf("Testing updating a password with the base authenticator.")
 }
 
 func testSetup() Authenticator {
 	authDatabaseEntries = []user{}
 
 	authenticator := NewBaseAuthenticator()
+	return authenticator
+}
+
+func testSetupWithDefaultUser() Authenticator {
+	authenticator := testSetup()
+
+	authenticator.CreateUser(defaultUsername, defaultPassword)
+
 	return authenticator
 }

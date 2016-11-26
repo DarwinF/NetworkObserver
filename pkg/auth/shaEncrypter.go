@@ -50,6 +50,9 @@ func (a *shaAdapter) Encrypt(input string) (eValue, salt string) {
 	return eStr, sStr
 }
 
+// Validate - Takes in a value (input) and encrypts it with the salt value
+// and returns whether the encrypted input is the same as the password value
+// taken in
 func (a *shaAdapter) Validate(input, salt, password string) (valid bool) {
 	var encryptedString string
 	valid = false
@@ -58,7 +61,7 @@ func (a *shaAdapter) Validate(input, salt, password string) (valid bool) {
 
 	if err != nil {
 		log.Printf("[ERROR] There was an error decoding the string %s\n", err.Error())
-		return false
+		return
 	}
 	e, _ := sha256WithSalt([]byte(input), decoded)
 	encryptedString = base64.StdEncoding.EncodeToString(e[:])
