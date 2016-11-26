@@ -8,8 +8,6 @@ import (
 	"io/ioutil"
 	"os"
 	"reflect"
-
-	"github.com/darwinfroese/networkobserver/pkg/settings"
 )
 
 //--------------------------------
@@ -76,7 +74,6 @@ type Configuration struct {
 //--------------------------------
 // Variables
 //--------------------------------
-var loc = settings.AppLocation
 var defaultConfigPath = "./config.json"
 
 var updated = false

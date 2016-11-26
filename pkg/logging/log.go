@@ -9,7 +9,7 @@ import (
 	"github.com/darwinfroese/networkobserver/pkg/settings"
 )
 
-var logloc = settings.AppLocation + "/Logs"
+var logloc = settings.LogLocation
 
 func init() {
 	// Check if the log folder exists

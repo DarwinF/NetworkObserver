@@ -1,116 +1,149 @@
-// Package auth provides functionality for authenticating
-// users to the system.
-//
-// Default Configuration Values
-// * Password Encryption Method: sha256
-// * Salt length in bits: 64
 package auth
 
 import (
-	"crypto/sha256"
-	"math/rand"
-
+	"bufio"
 	"fmt"
+	"log"
+	"os"
+	"strings"
+
+	"github.com/darwinfroese/networkobserver/pkg/settings"
 )
 
-// Settings is a struct of all the cofiguration options
-// used for configuring the auth package
-type Settings struct {
-	EncryptionMethod string
-	SaltLength       int
-	UseSalt          bool
-}
-
-// Authenticator object for authentication
-type Authenticator interface {
-	Encrypt(string) (string, string, error)
-	Validate(string, string, string) (bool, error)
-}
-
-type authAdapter struct {
-}
-
-var authSettings Settings
+var authDbLoc string
 
 func init() {
-	authSettings = Settings{
-		EncryptionMethod: "sha256",
-		SaltLength:       64,
-		UseSalt:          true,
-	}
-}
+	authDbLoc = settings.AuthenticationDBLocation + settings.AuthenticationDBName
 
-// NewAuthenticator returns a new authenticator that can be used for authenticating
-func NewAuthenticator(settings *Settings) (Authenticator, error) {
-	a := authAdapter{}
+	if _, err := os.Stat(authDbLoc); os.IsNotExist(err) {
+		err := createFile(authDbLoc)
 
-	if settings != nil {
-		authSettings = *settings
-	}
+		if err != nil {
+			log.Panicf("Error creating the file: %s\n%s", authDbLoc, err.Error())
+		}
 
-	return &a, nil
-}
-
-func (a *authAdapter) Encrypt(v string) (eValue, salt string, err error) {
-	if authSettings.UseSalt {
-		e, s := sha256WithSalt(v, "")
-		eValue = string(e[:])
-		salt = string(s[:])
 		return
 	}
 
-	e := sha256WithoutSalt(v)
-	eValue = string(e[:])
+	records, err := readFile(authDbLoc)
 
-	return
+	if err != nil {
+		log.Panicf("Error reading users from file: %s\n%d Records were read in.", err.Error(), records)
+	}
 }
 
-func (a *authAdapter) Validate(input, salt, password string) (valid bool, err error) {
-	var encryptedString string
-	valid = false
+func readFile(fileLocation string) (int, error) {
+	var records = 0
 
-	if authSettings.UseSalt {
-		e, _ := sha256WithSalt(input, salt)
-		encryptedString = string(e[:])
-	} else {
-		e := sha256WithoutSalt(input)
-		encryptedString = string(e[:])
+	file, err := os.Open(fileLocation)
+
+	if err != nil {
+		return records, err
 	}
 
-	if encryptedString == password {
-		valid = true
-	}
+	authDatabaseEntries = []user{}
+	defer file.Close()
 
-	return
-}
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := scanner.Text()
+		user, success := parseLineToUser(line)
 
-func sha256WithoutSalt(value string) [sha256.Size]byte {
-	encrypted := sha256.Sum256([]byte(value))
-
-	return encrypted
-}
-
-func sha256WithSalt(value, saltValue string) ([sha256.Size]byte, []byte) {
-	salt := make([]byte, authSettings.SaltLength)
-
-	if saltValue != "" {
-		salt = []byte(saltValue)
-	} else {
-		n, err := rand.Read(salt)
-
-		if err != nil {
-			fmt.Println("There was an error generating a salt: ", err)
-			return [sha256.Size]byte{}, nil
-		}
-
-		if n != authSettings.SaltLength {
-			fmt.Printf("Only %d characters were read.\n", n)
-			return [sha256.Size]byte{}, nil
+		if success {
+			authDatabaseEntries = append(authDatabaseEntries, user)
+			records++
 		}
 	}
 
-	saltedVal := append([]byte(value), salt...)
-	encrypted := sha256.Sum256(saltedVal)
+	return records, nil
+}
 
-	return encrypted, salt
+func createFile(fileLocation string) error {
+	file, err := os.Create(fileLocation)
+
+	file.Close()
+	return err
+}
+
+func parseLineToUser(line string) (user, bool) {
+	fields := strings.Split(line, ":")
+
+	if len(fields) != 3 {
+		return user{}, false
+	}
+
+	user := user{
+		Username: fields[0],
+		Password: fields[1],
+		Salt:     fields[2],
+	}
+
+	return user, true
+}
+
+func writeAllUsersToFile() (int, error) {
+	records := 0
+	file, err := os.OpenFile(authDbLoc, os.O_WRONLY, 0777)
+
+	if err != nil {
+		log.Printf("[Error] Couldn't open the database for writing. %s", err.Error())
+		return records, err
+	}
+
+	defer file.Close()
+
+	for i := range authDatabaseEntries {
+		writeUserToFile(authDatabaseEntries[i], file)
+		records++
+	}
+
+	return records, nil
+}
+
+func writeUserToFile(user user, file *os.File) {
+	line := userToString(user)
+
+	w := bufio.NewWriter(file)
+
+	fmt.Fprintf(w, "%s\n", line)
+	w.Flush()
+}
+
+func updateUsername(username, newUsername string) bool {
+	var updated = false
+	for i := range authDatabaseEntries {
+		if authDatabaseEntries[i].Username == username {
+			authDatabaseEntries[i].Username = newUsername
+			updated = true
+		}
+	}
+
+	if updated {
+		writeAllUsersToFile()
+	}
+
+	return updated
+}
+
+func updatePassword(username, password, salt string) bool {
+	var updated = false
+	for i := range authDatabaseEntries {
+		if authDatabaseEntries[i].Username == username {
+			authDatabaseEntries[i].Password = password
+			authDatabaseEntries[i].Salt = salt
+			updated = true
+		}
+	}
+
+	if updated {
+		writeAllUsersToFile()
+	}
+
+	return updated
+}
+
+func userToString(user user) string {
+	line := user.Username + ":" + user.Password + ":" + user.Salt
+
+	return line
 }
