@@ -1,14 +1,15 @@
 package auth
 
-var authDatabaseEntries []User
+var authDatabaseEntries []user
 
 var saltMaxLen = 64
 
 // Authenticator is an interface for base authentication methods
 type Authenticator interface {
-	Login(User) (bool, error)
-	CreateUser(User) (bool, error)
-	UpdatePassword(User, []byte) (bool, User, error)
+	Login(string, string) (bool, error)
+	CreateUser(string, string) (bool, error)
+	UpdatePassword(string, string, string) (bool, error)
+	UpdateUsername(string, string) (bool, error)
 }
 
 // encrypter interface for different encryption methods
@@ -18,13 +19,12 @@ type encrypter interface {
 }
 
 // User stores user authentication information
-type User struct {
+type user struct {
 	Username string
 	Password string
 	Salt     string
 }
 
 type baseAuthenticator struct {
-	enc   encrypter
-	users []User
+	enc encrypter
 }

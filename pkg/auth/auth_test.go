@@ -9,10 +9,9 @@ import (
 )
 
 var testUserCount = 5
-var defaultPassword = "Password"
 
 func Test_FileIsCreatedIfMissing(t *testing.T) {
-	log.Printf("Looking for auth database at: %s\n", authDbLoc)
+	log.Printf("Testing that a database file will be created if it's missing.")
 
 	err := removeExistingAuthFile()
 
@@ -179,7 +178,7 @@ func setupTest() error {
 }
 
 func cleanupTests() {
-	authDatabaseEntries = []User{}
+	authDatabaseEntries = []user{}
 	os.Remove(authDbLoc)
 }
 
@@ -190,7 +189,7 @@ func populateDatabase() {
 		pass, salt := encrypter.Encrypt(defaultPassword)
 		username := fmt.Sprintf("Test User %d", i)
 
-		authDatabaseEntries = append(authDatabaseEntries, User{Username: username, Password: pass, Salt: salt})
+		authDatabaseEntries = append(authDatabaseEntries, user{Username: username, Password: pass, Salt: salt})
 	}
 }
 
