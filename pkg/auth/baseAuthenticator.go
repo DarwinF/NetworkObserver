@@ -70,7 +70,28 @@ func (adapter *baseAuthenticator) UpdatePassword(username, oldPassword, newPassw
 }
 
 func (adapter *baseAuthenticator) UpdateUsername(oldUsername, newUsername string) (bool, error) {
-	return false, nil
+	_, inuse := checkIfUsernameInDatabase(oldUsername)
+
+	if !inuse {
+		errMsg := fmt.Sprintf("There is no account with the username %s in the database.", oldUsername)
+		return false, errors.New(errMsg)
+	}
+
+	_, available := checkIfUsernameInDatabase(newUsername)
+
+	if available {
+		errMsg := fmt.Sprintf("The username %s is not available.", newUsername)
+		return false, errors.New(errMsg)
+	}
+
+	updated := updateUsername(oldUsername, newUsername)
+
+	if !updated {
+		err := errors.New("Unable to update the username in the database.")
+		return false, err
+	}
+
+	return true, nil
 }
 
 func checkIfUsernameInDatabase(username string) (user, bool) {
