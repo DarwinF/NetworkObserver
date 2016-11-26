@@ -41,7 +41,7 @@ func readFile(fileLocation string) (int, error) {
 		return records, err
 	}
 
-	authDatabaseEntries = []User{}
+	authDatabaseEntries = []user{}
 	defer file.Close()
 
 	scanner := bufio.NewScanner(file)
@@ -65,14 +65,14 @@ func createFile(fileLocation string) error {
 	return err
 }
 
-func parseLineToUser(line string) (User, bool) {
+func parseLineToUser(line string) (user, bool) {
 	fields := strings.Split(line, ":")
 
 	if len(fields) != 3 {
-		return User{}, false
+		return user{}, false
 	}
 
-	user := User{
+	user := user{
 		Username: fields[0],
 		Password: fields[1],
 		Salt:     fields[2],
@@ -100,7 +100,7 @@ func writeAllUsersToFile() (int, error) {
 	return records, nil
 }
 
-func writeUserToFile(user User, file *os.File) {
+func writeUserToFile(user user, file *os.File) {
 	line := userToString(user)
 
 	w := bufio.NewWriter(file)
@@ -142,7 +142,7 @@ func updatePassword(username, password, salt string) bool {
 	return updated
 }
 
-func userToString(user User) string {
+func userToString(user user) string {
 	line := user.Username + ":" + user.Password + ":" + user.Salt
 
 	return line

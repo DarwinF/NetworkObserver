@@ -6,7 +6,6 @@ import (
 )
 
 var enc encrypter
-var testPassword = "test password"
 
 func Test_SaltingIsRandom(t *testing.T) {
 	log.Println("Testing that salting is random.")
@@ -14,8 +13,8 @@ func Test_SaltingIsRandom(t *testing.T) {
 	settings := shaSettings
 	setupEncrypter(&settings)
 
-	encrypted1, salt1 := enc.Encrypt(testPassword)
-	encrypted2, salt2 := enc.Encrypt(testPassword)
+	encrypted1, salt1 := enc.Encrypt(defaultPassword)
+	encrypted2, salt2 := enc.Encrypt(defaultPassword)
 
 	if encrypted1 == encrypted2 {
 		t.Fatal("The salted passwords are the same")
@@ -31,8 +30,8 @@ func Test_VerifyWorksWithSalting(t *testing.T) {
 	settings := shaSettings
 	setupEncrypter(&settings)
 
-	encrypted, salt := enc.Encrypt(testPassword)
-	valid := enc.Validate(testPassword, salt, encrypted)
+	encrypted, salt := enc.Encrypt(defaultPassword)
+	valid := enc.Validate(defaultPassword, salt, encrypted)
 
 	if !valid {
 		t.Fatal("The passwords didn't match")
