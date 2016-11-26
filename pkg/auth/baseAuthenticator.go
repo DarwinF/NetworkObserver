@@ -26,17 +26,30 @@ func NewBaseAuthenticator() Authenticator {
 }
 
 func (adapter *baseAuthenticator) Login(username, password string) (bool, error) {
+	user, inuse := checkIfUsernameInDatabase(username)
 
-	return false, nil
+	if !inuse {
+		errMsg := fmt.Sprintf("The username %s is not in the database.", username)
+		err := errors.New(errMsg)
+		return false, err
+	}
+
+	valid := adapter.enc.Validate(password, user.Salt, user.Password)
+
+	if !valid {
+		err := errors.New("The password entered was incorrect.")
+		return false, err
+	}
+
+	return true, nil
 }
 
 func (adapter *baseAuthenticator) CreateUser(username, password string) (bool, error) {
-	for i := range authDatabaseEntries {
-		if username == authDatabaseEntries[i].Username {
-			errMsg := fmt.Sprintf("The username %s is already in use.", username)
-			err := errors.New(errMsg)
-			return false, err
-		}
+	_, inuse := checkIfUsernameInDatabase(username)
+
+	if inuse {
+		errMsg := fmt.Sprintf("The username %s is already in use.", username)
+		return false, errors.New(errMsg)
 	}
 
 	encryptedPass, salt := adapter.enc.Encrypt(password)
@@ -58,4 +71,17 @@ func (adapter *baseAuthenticator) UpdatePassword(username, oldPassword, newPassw
 
 func (adapter *baseAuthenticator) UpdateUsername(oldUsername, newUsername string) (bool, error) {
 	return false, nil
+}
+
+func checkIfUsernameInDatabase(username string) (user, bool) {
+	user := user{}
+	found := false
+	for i := range authDatabaseEntries {
+		if username == authDatabaseEntries[i].Username {
+			user = authDatabaseEntries[i]
+			found = true
+		}
+	}
+
+	return user, found
 }
