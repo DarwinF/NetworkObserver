@@ -101,8 +101,40 @@ func Test_BaseAuthenticatorCannotUpdateUsernameToInUseUsername(t *testing.T) {
 	}
 }
 
-func Test_BaseAuthenticatorUpdatePassword(t *testing.T) {
+func Test_BaseAuthenticatorUpdatePasswordSuccessfully(t *testing.T) {
 	log.Printf("Testing updating a password with the base authenticator.")
+	newPassword := "super secret"
+	authenticator := testSetupWithDefaultUser()
+
+	updated, err := authenticator.UpdatePassword(defaultUsername, defaultPassword, newPassword)
+
+	if !updated {
+		t.Errorf("There was an error updating the password.\n%s", err.Error())
+	}
+}
+
+func Test_BaseAuthenticatorFailsToUpdatePasswordIfPasswordWrong(t *testing.T) {
+	log.Printf("Testing updating the password with an incorrect password.")
+	newPassword := "super secret"
+	authenticator := testSetupWithDefaultUser()
+
+	updated, _ := authenticator.UpdatePassword(defaultUsername, newPassword, newPassword)
+
+	if updated {
+		t.Errorf("The password was updated when the user password was wrong.")
+	}
+}
+
+func Test_BaseAuthenticatorFailsToUpdatePasswordWithWrongUsername(t *testing.T) {
+	log.Printf("Testing updating the passwordi with an incorrect username.")
+	wrongUsername := "Wrong username"
+	authenticator := testSetupWithDefaultUser()
+
+	updated, _ := authenticator.UpdatePassword(wrongUsername, defaultPassword, defaultPassword)
+
+	if updated {
+		t.Errorf("The password was updated when the username was wrong.")
+	}
 }
 
 func testSetup() Authenticator {

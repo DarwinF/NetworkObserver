@@ -66,7 +66,28 @@ func (adapter *baseAuthenticator) CreateUser(username, password string) (bool, e
 }
 
 func (adapter *baseAuthenticator) UpdatePassword(username, oldPassword, newPassword string) (bool, error) {
-	return false, nil
+	user, inuse := checkIfUsernameInDatabase(username)
+
+	if !inuse {
+		errMsg := fmt.Sprintf("There is no account with the username %s in the database.", username)
+		return false, errors.New(errMsg)
+	}
+
+	correctPassword := adapter.enc.Validate(oldPassword, user.Salt, user.Password)
+
+	if !correctPassword {
+		return false, errors.New("The password entered was incorrect.")
+	}
+
+	encryptedPass, salt := adapter.enc.Encrypt(newPassword)
+	updated := updatePassword(username, encryptedPass, salt)
+
+	if !updated {
+		errMsg := fmt.Sprintf("There was an error updated the password for the user %s in the database.", username)
+		return false, errors.New(errMsg)
+	}
+
+	return true, nil
 }
 
 func (adapter *baseAuthenticator) UpdateUsername(oldUsername, newUsername string) (bool, error) {
