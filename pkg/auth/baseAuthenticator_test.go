@@ -64,8 +64,77 @@ func Test_BaseAuthenticatorDoesntAllowTheSameUsername(t *testing.T) {
 	}
 }
 
-func Test_BaseAuthenticatorUpdatePassword(t *testing.T) {
+func Test_BaseAuthenticatorUpdatesUsernameSuccessfully(t *testing.T) {
+	log.Printf("Testing updating to a username that isn't in use.")
+	newUsername := "New User"
+
+	authenticator := testSetupWithDefaultUser()
+
+	updated, err := authenticator.UpdateUsername(defaultUsername, newUsername)
+
+	if !updated {
+		t.Errorf("Unable to update the user %s in the database.\n", err.Error())
+	}
+
+	found := searchForUser(newUsername)
+
+	if !found {
+		t.Errorf("The user %s was not found.", newUsername)
+	}
+}
+
+func Test_BaseAuthenticatorCannotUpdateUsernameToInUseUsername(t *testing.T) {
+	log.Printf("Testing updating to a username that is in use.")
+	inUseName := "User in use"
+
+	authenticator := testSetupWithDefaultUser()
+	created, err := authenticator.CreateUser(inUseName, defaultPassword)
+
+	if !created {
+		t.Errorf("Couldn't create the user %s.\n%s", inUseName, err.Error())
+	}
+
+	updated, _ := authenticator.UpdateUsername(defaultUsername, inUseName)
+
+	if updated {
+		t.Errorf("Updated the username to a username that is in use.")
+	}
+}
+
+func Test_BaseAuthenticatorUpdatePasswordSuccessfully(t *testing.T) {
 	log.Printf("Testing updating a password with the base authenticator.")
+	newPassword := "super secret"
+	authenticator := testSetupWithDefaultUser()
+
+	updated, err := authenticator.UpdatePassword(defaultUsername, defaultPassword, newPassword)
+
+	if !updated {
+		t.Errorf("There was an error updating the password.\n%s", err.Error())
+	}
+}
+
+func Test_BaseAuthenticatorFailsToUpdatePasswordIfPasswordWrong(t *testing.T) {
+	log.Printf("Testing updating the password with an incorrect password.")
+	newPassword := "super secret"
+	authenticator := testSetupWithDefaultUser()
+
+	updated, _ := authenticator.UpdatePassword(defaultUsername, newPassword, newPassword)
+
+	if updated {
+		t.Errorf("The password was updated when the user password was wrong.")
+	}
+}
+
+func Test_BaseAuthenticatorFailsToUpdatePasswordWithWrongUsername(t *testing.T) {
+	log.Printf("Testing updating the passwordi with an incorrect username.")
+	wrongUsername := "Wrong username"
+	authenticator := testSetupWithDefaultUser()
+
+	updated, _ := authenticator.UpdatePassword(wrongUsername, defaultPassword, defaultPassword)
+
+	if updated {
+		t.Errorf("The password was updated when the username was wrong.")
+	}
 }
 
 func testSetup() Authenticator {
@@ -81,4 +150,16 @@ func testSetupWithDefaultUser() Authenticator {
 	authenticator.CreateUser(defaultUsername, defaultPassword)
 
 	return authenticator
+}
+
+func searchForUser(username string) bool {
+	found := false
+	for i := range authDatabaseEntries {
+		if username == authDatabaseEntries[i].Username {
+			log.Printf("found user %s", authDatabaseEntries[i].Username)
+			found = true
+		}
+	}
+
+	return found
 }
